@@ -1,5 +1,3 @@
-# Finish by 13th of September
-
 #Import addons to python language (WILL NOT WORK WITHOUT)
 import customtkinter as ctk #Will need to install this via pip in comand prompt
 from   tkinter import *
@@ -7,9 +5,6 @@ import datetime
 import re
 import sqlite3
 from contextlib import closing
-
-
-
 
 #Function that contains the Program
 def Q_Store_Software_07():
@@ -46,9 +41,6 @@ def Q_Store_Software_07():
     middleFrame.pack(side='left', fill="both",expand=True)
     rightFrame = ctk.CTkFrame(mainFrame)
     rightFrame.pack(side='left', fill="both",expand=True)
-
-    
-
 
     #Creating the function that contains options for AAC Members
     def AACMemberOptions():
@@ -3222,8 +3214,3 @@ def Q_Store_Software_07():
 
 #Calls the function
 Q_Store_Software_07()
-
-
-
-
-hbxgmsfghmsz

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="ER Diagram">
+	<entities>
+		<data-source id="sqlite_jdbc-18b947bb103-32720d6579c5f822">
+			<entity id="1" name="Account_Type" fq-name="Account_Type"/>
+			<entity id="2" name="Accounts" fq-name="Accounts"/>
+			<entity id="3" name="Cadets" fq-name="Cadets"/>
+			<entity id="4" name="Categories" fq-name="Categories"/>
+			<entity id="5" name="Log_Type" fq-name="Log_Type"/>
+			<entity id="6" name="Logs" fq-name="Logs"/>
+			<entity id="7" name="Stores" fq-name="Stores"/>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="Accounts_FK_2" fq-name="Accounts.Accounts_FK_2" type="fk" pk-ref="1" fk-ref="2"/>
+		<relation name="Accounts_FK_1" fq-name="Accounts.Accounts_FK_1" type="fk" pk-ref="3" fk-ref="2"/>
+		<relation name="Logs_FK" fq-name="Logs.Logs_FK" type="fk" pk-ref="3" fk-ref="6"/>
+		<relation name="Stores_FK" fq-name="Stores.Stores_FK" type="fk" pk-ref="4" fk-ref="7"/>
+		<relation name="Logs_FK_2" fq-name="Logs.Logs_FK_2" type="fk" pk-ref="5" fk-ref="6"/>
+		<relation name="Logs_FK_1" fq-name="Logs.Logs_FK_1" type="fk" pk-ref="7" fk-ref="6"/>
+	</relations>
+</diagram>
