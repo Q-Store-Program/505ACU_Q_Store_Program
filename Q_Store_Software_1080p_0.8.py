@@ -2533,8 +2533,8 @@ def Q_Store_Software_07():
                             adminAccountSelection= adminAccountsListbox.curselection()
                             if adminAccountSelection:
 
-                                adminAccountID= adminAccountsListbox.get(adminAccountSelection[0])
-                                adminAccountID= str(adminAccountID).split(',')[0]
+                                AccountID= adminAccountsListbox.get(adminAccountSelection[0])
+                                AccountID= str(AccountID).split(',')[0]
 
                                 if replacementQuestion == '':
 
@@ -2568,7 +2568,7 @@ def Q_Store_Software_07():
                                     
                                     else:
                                         cursor = connection.cursor()
-                                        cursor.execute(f"UPDATE Admin_Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE Admin_AccountID={adminAccountID}")
+                                        cursor.execute(f"UPDATE Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE Admin_AccountID={AccountID}")
                                         connection.commit()
                                         changeSecretQuestionOptions()
 
@@ -2603,8 +2603,8 @@ def Q_Store_Software_07():
 
                                     else:
                                         cursor = connection.cursor()
-                                        cursor.execute(f"UPDATE Admin_Accounts SET Secret_Question='{replacementQuestion}' WHERE Admin_AccountID={adminAccountID}")
-                                        cursor.execute(f"UPDATE Admin_Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE Admin_AccountID={adminAccountID}")
+                                        cursor.execute(f"UPDATE Accounts SET Secret_Question='{replacementQuestion}' WHERE AccountID={AccountID}")
+                                        cursor.execute(f"UPDATE Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE AccountID={AccountID}")
                                         connection.commit()
                                         changeSecretQuestionOptions()
 
@@ -2652,13 +2652,13 @@ def Q_Store_Software_07():
                         #Create list box and writes the contents of the database into it
                         adminAccountsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height=10, font= standardFont)
                         cursor = connection.cursor()
-                        data = cursor.execute(f"SELECT Admin_AccountID,Secret_Question,Secret_Question_Answer FROM Admin_Accounts").fetchall()
+                        data = cursor.execute(f"SELECT AccountID,Secret_Question,Secret_Question_Answer FROM Accounts WHERE Account_TypeID = 1").fetchall()
                         formatted_data = []
                         for item in data:
-                            adminAccountID = item[0]
+                            AccountID = item[0]
                             secret_Question = item[1]
                             secret_Question_Answer = item[2]
-                            formatted_data.append(f"{adminAccountID}, {secret_Question}, {secret_Question_Answer}")
+                            formatted_data.append(f"{AccountID}, {secret_Question}, {secret_Question_Answer}")
                         for row in formatted_data:
                             adminAccountsListbox.insert(END, row)
                         adminAccountsListbox.pack(side=LEFT)
@@ -2765,7 +2765,7 @@ def Q_Store_Software_07():
 
                                 else:
                                     cursor = connection.cursor()
-                                    cursor.execute(f"UPDATE Admin_Accounts SET Password='{adminNewPasswordConfirm}' WHERE Admin_AccountID={adminAccountID}")
+                                    cursor.execute(f"UPDATE Accounts SET Password='{adminNewPasswordConfirm}' WHERE AccountID={AccountID}")
                                     connection.commit()
                                     changePasswordOptions()
                             
@@ -2777,12 +2777,12 @@ def Q_Store_Software_07():
                         label.pack(pady = standardYPadding)
 
                         cursor = connection.cursor()
-                        data = cursor.execute(f"SELECT Admin_AccountID, Password FROM Admin_Accounts").fetchall()
+                        data = cursor.execute(f"SELECT AccountID, Password FROM Accounts WHERE Account_TypeID = 1").fetchall()
                         formatted_data = []
                         for item in data:
-                            adminAccountID = item[0]
+                            AccountID = item[0]
                             adminAccountPassword = item[1]
-                            formatted_data.append(f"{adminAccountID}, {adminAccountPassword}")
+                            formatted_data.append(f"{AccountID}, {adminAccountPassword}")
 
                         #Creates an entry box
                         adminAccountOldPassword = ctk.CTkEntry(
@@ -2854,6 +2854,76 @@ def Q_Store_Software_07():
                     )
                     changePassword.pack(pady = standardYPadding)
 
+
+                def userAccountOptions():
+                    
+                    def addUserAccount():
+                        1
+
+                    def deleteUserAccount():
+                        1
+
+                    def changeSecretQuestion():
+                        1
+
+                    def changeUsername():
+                        1
+
+                    def changePassword():
+                        1
+
+
+                    addUserAccountButton = ctk.CTkButton(
+                        middleFrame,
+                        text= "Add User Account",
+                        font= (standardFont),
+                        width= standardWidth,
+                        height= standardHeight,
+                        command=addUserAccount,
+                        )
+                    addUserAccountButton.pack(pady = standardYPadding)
+
+                    removeUserAccountButton = ctk.CTkButton(
+                        middleFrame,
+                        text= "Remove User Account",
+                        font= (standardFont),
+                        width= standardWidth,
+                        height= standardHeight,
+                        command=deleteUserAccount,
+                        )
+                    removeUserAccountButton.pack(pady = standardYPadding)
+
+                    changeSecretQuestionButton = ctk.CTkButton(
+                        middleFrame,
+                        text= "Change Secret Question",
+                        font= (standardFont),
+                        width= standardWidth,
+                        height= standardHeight,
+                        command=changeSecretQuestion,
+                        )
+                    changeSecretQuestionButton.pack(pady = standardYPadding)
+
+                    changeUsernameButton = ctk.CTkButton(
+                        middleFrame,
+                        text= "Change Username",
+                        font= (standardFont),
+                        width= standardWidth,
+                        height= standardHeight,
+                        command=changeUsername,
+                        )
+                    changeUsernameButton.pack(pady = standardYPadding)
+
+                    changePasswordButton = ctk.CTkButton(
+                        middleFrame,
+                        text= "Change Password",
+                        font= (standardFont),
+                        width= standardWidth,
+                        height= standardHeight,
+                        command=changePassword,
+                        )
+                    changePasswordButton.pack(pady = standardYPadding)
+
+
                 #Creats a ctk button
                 removePersonButton = ctk.CTkButton(
                     leftBottomFrame,
@@ -2909,6 +2979,17 @@ def Q_Store_Software_07():
                     )
                 adminAcountButton.pack(pady = standardYPadding)
 
+                #Creats a ctk button
+                userAcountButton = ctk.CTkButton(
+                    leftBottomFrame,
+                    text= "User Account Options",
+                    font= (standardFont),
+                    width= standardWidth,
+                    height= standardHeight,
+                    command=userAccountOptions,
+                    )
+                userAcountButton.pack(pady = standardYPadding)
+
             def returnToLogin():
                 passwordWindow.destroy()
                 adminOptions()
@@ -2916,7 +2997,7 @@ def Q_Store_Software_07():
 
             passwords= []
             cursor = connection.cursor()
-            data= cursor.execute(f"SELECT Password FROM Admin_Accounts").fetchall()
+            data= cursor.execute(f"SELECT Password FROM Accounts WHERE Account_TypeID = 1").fetchall()
             data= str(data).replace('(','').replace(')','').replace(',','').replace("'",'').replace(" ",',').replace("[",'').replace("]",'')
             data=data.split(',')
             for password in data:
@@ -3013,7 +3094,7 @@ def Q_Store_Software_07():
                 widgets.destroy()
 
             cursor = connection.cursor()
-            data = cursor.execute("SELECT Secret_Question,Secret_Question_Answer,Password FROM Admin_Accounts").fetchall()
+            data = cursor.execute("SELECT Secret_Question,Secret_Question_Answer,Password FROM Accounts WHERE Account_TypeID = 1").fetchall()
             formatted_data = []
             for item in data:
                 adminAccountSecretQuestion = item[0]
