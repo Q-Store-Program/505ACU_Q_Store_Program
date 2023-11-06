@@ -300,3 +300,8 @@ INSERT INTO Account_Type (Account_Type_Name)
 VALUES
 ('Admin'),
 ('Normal');
+
+INSERT INTO Log_Type (Name)
+VALUES
+('Short_Term'),
+('Long_Term');
