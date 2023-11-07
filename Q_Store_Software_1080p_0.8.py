@@ -2858,7 +2858,268 @@ def Q_Store_Software_07():
                 def userAccountOptions():
                     
                     def addUserAccount():
-                        1
+                        
+                        def addAccount():
+                            rowSelection = namesListListbox.curselection()
+                            if rowSelection:
+                                rowIndex = rowSelection[0]
+                                row = formatted_data[rowIndex]
+                                cadetID= str(row).split(" ")[0]
+                                firstName= str(row).split(" ")[2]
+                                lastName= str(row).split(" ")[3]
+                                username= firstName+'_'+lastName
+                                accountType= "2"
+                                password= passwordEntry.get()
+                                confirmedPassword= confirmedPasswordEntry.get()
+                                secretQuestion= secretQuestionEntry.get()
+                                secretQuestionAnswer= secretQuestionAnswerEntry.get()
+
+                                if confirmedPassword != password:
+
+                                    #Creating an error window
+                                    errorWindow= ctk.CTkToplevel(root)
+                                    errorWindow.title("Error Window")
+                                    errorWindow.geometry("1200x500")
+                                    errorWindow.transient(root)
+                                    errorWindow.lift()
+                                    
+                                    #Creating a label
+                                    errorLabel= ctk.CTkLabel(
+                                        errorWindow,
+                                        text= "Passwords do not match",
+                                        font= standardFont
+                                        )
+                                    errorLabel.pack(pady= standardYPadding)
+
+                                    #Creating a button
+                                    errorButton= ctk.CTkButton(
+                                        errorWindow,
+                                        text= "Close Window",
+                                        font= standardFont,
+                                        width= standardWidth,
+                                        height= standardHeight,
+                                        command= errorWindow.destroy
+                                        )
+                                    errorButton.pack(pady= standardYPadding)
+
+                                else:
+                                    if password == "":
+                                        if confirmedPassword == "":
+                                            if secretQuestion == "":
+                                                if secretQuestionAnswer == "":
+                                                    #Creating an error window
+                                                    errorWindow= ctk.CTkToplevel(root)
+                                                    errorWindow.title("Error Window")
+                                                    errorWindow.geometry("1200x500")
+                                                    errorWindow.transient(root)
+                                                    errorWindow.lift()
+                                                    
+                                                    #Creating a label
+                                                    errorLabel= ctk.CTkLabel(
+                                                        errorWindow,
+                                                        text= "You have left a field empty",
+                                                        font= standardFont
+                                                        )
+                                                    errorLabel.pack(pady= standardYPadding)
+
+                                                    #Creating a button
+                                                    errorButton= ctk.CTkButton(
+                                                        errorWindow,
+                                                        text= "Close Window",
+                                                        font= standardFont,
+                                                        width= standardWidth,
+                                                        height= standardHeight,
+                                                        command= errorWindow.destroy
+                                                        )
+                                                    errorButton.pack(pady= standardYPadding)
+
+                                                else:
+                                                    cursor = connection.cursor()
+                                                    cursor.execute(f"INSERT INTO Accounts (CadetID, Username, Password, Account_TypeID, Secret_Question, Secret_Question_Answer) VALUES ('{cadetID}','{username}','{password}','{accountType}','{secretQuestion}','{secretQuestionAnswer}')")
+                                                    connection.commit()
+                                            else:
+                                                #Creating an error window
+                                                errorWindow= ctk.CTkToplevel(root)
+                                                errorWindow.title("Error Window")
+                                                errorWindow.geometry("1200x500")
+                                                errorWindow.transient(root)
+                                                errorWindow.lift()
+                                                
+                                                #Creating a label
+                                                errorLabel= ctk.CTkLabel(
+                                                    errorWindow,
+                                                    text= "You have left a field empty",
+                                                    font= standardFont
+                                                    )
+                                                errorLabel.pack(pady= standardYPadding)
+
+                                                #Creating a button
+                                                errorButton= ctk.CTkButton(
+                                                    errorWindow,
+                                                    text= "Close Window",
+                                                    font= standardFont,
+                                                    width= standardWidth,
+                                                    height= standardHeight,
+                                                    command= errorWindow.destroy
+                                                    )
+                                                errorButton.pack(pady= standardYPadding)
+                                        else:
+                                            #Creating an error window
+                                            errorWindow= ctk.CTkToplevel(root)
+                                            errorWindow.title("Error Window")
+                                            errorWindow.geometry("1200x500")
+                                            errorWindow.transient(root)
+                                            errorWindow.lift()
+                                            
+                                            #Creating a label
+                                            errorLabel= ctk.CTkLabel(
+                                                errorWindow,
+                                                text= "You have left a field empty",
+                                                font= standardFont
+                                                )
+                                            errorLabel.pack(pady= standardYPadding)
+
+                                            #Creating a button
+                                            errorButton= ctk.CTkButton(
+                                                errorWindow,
+                                                text= "Close Window",
+                                                font= standardFont,
+                                                width= standardWidth,
+                                                height= standardHeight,
+                                                command= errorWindow.destroy
+                                                )
+                                            errorButton.pack(pady= standardYPadding)
+                                    else:
+                                        #Creating an error window
+                                        errorWindow= ctk.CTkToplevel(root)
+                                        errorWindow.title("Error Window")
+                                        errorWindow.geometry("1200x500")
+                                        errorWindow.transient(root)
+                                        errorWindow.lift()
+                                        
+                                        #Creating a label
+                                        errorLabel= ctk.CTkLabel(
+                                            errorWindow,
+                                            text= "You have left a field empty",
+                                            font= standardFont
+                                            )
+                                        errorLabel.pack(pady= standardYPadding)
+
+                                        #Creating a button
+                                        errorButton= ctk.CTkButton(
+                                            errorWindow,
+                                            text= "Close Window",
+                                            font= standardFont,
+                                            width= standardWidth,
+                                            height= standardHeight,
+                                            command= errorWindow.destroy
+                                            )
+                                        errorButton.pack(pady= standardYPadding)
+
+                            else:
+                                #Creating an error window
+                                errorWindow= ctk.CTkToplevel(root)
+                                errorWindow.title("Error Window")
+                                errorWindow.geometry("1200x500")
+                                errorWindow.transient(root)
+                                errorWindow.lift()
+                                
+                                #Creating a label
+                                errorLabel= ctk.CTkLabel(
+                                    errorWindow,
+                                    text= "You have not selected a person, Please try again.",
+                                    font= standardFont
+                                    )
+                                errorLabel.pack(pady= standardYPadding)
+
+                                #Creating a button
+                                errorButton= ctk.CTkButton(
+                                    errorWindow,
+                                    text= "Close Window",
+                                    font= standardFont,
+                                    width= standardWidth,
+                                    height= standardHeight,
+                                    command= errorWindow.destroy
+                                    )
+                                errorButton.pack(pady= standardYPadding)
+
+
+
+
+
+
+                        #Create frame
+                        listboxFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
+                        listboxFrame.pack(pady = standardYPadding)
+
+                        #Creates list box and fills it with members names using SQL
+                        namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 30, height= 25, font= standardFont)
+                        cursor = connection.cursor()
+                        data = cursor.execute("SELECT CadetID,rank,first_name,last_name FROM Cadets").fetchall()
+                        formatted_data = []
+                        for row in data:
+                            formatted_data.append(' '.join(map(str, row)))
+                        for row in formatted_data:
+                            namesListListbox.insert(END, row)
+                        namesListListbox.pack(side=LEFT)
+
+                        #Creates scroll bar
+                        listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=namesListListbox.yview)
+                        listboxScrollbar.pack(side="right", fill=Y)
+                        namesListListbox.config(yscrollcommand=listboxScrollbar.set)   
+
+                        #Creates an entry box
+                        passwordEntry = ctk.CTkEntry(
+                            rightFrame, 
+                            placeholder_text="Please Enter a Password",
+                            font= standardFont,
+                            width= 500,
+                            height= standardHeight,
+                            show= '*',
+                            )
+                        passwordEntry.pack(pady = standardYPadding)
+
+                        #Creates an entry box
+                        confirmedPasswordEntry = ctk.CTkEntry(
+                            rightFrame, 
+                            placeholder_text="Please Enter the Password Again",
+                            font= standardFont,
+                            width= 500,
+                            height= standardHeight,
+                            show= '*',
+                            )
+                        confirmedPasswordEntry.pack(pady = standardYPadding)
+
+                        #Creates an entry box
+                        secretQuestionEntry = ctk.CTkEntry(
+                            rightFrame, 
+                            placeholder_text="Enter A Secret Question",
+                            font= standardFont,
+                            width= 500,
+                            height= standardHeight,
+                            )
+                        secretQuestionEntry.pack(pady = standardYPadding)
+
+                        #Creates an entry box
+                        secretQuestionAnswerEntry = ctk.CTkEntry(
+                            rightFrame, 
+                            placeholder_text="Enter Secret Question Answer",
+                            font= standardFont,
+                            width= 500,
+                            height= standardHeight,
+                            )
+                        secretQuestionAnswerEntry.pack(pady = standardYPadding)
+
+                        #Creates a button
+                        addAccountButton = ctk.CTkButton(
+                            rightFrame,
+                            text= "Add Account",
+                            font= standardFont,
+                            width= 500,
+                            height= standardHeight,
+                            command= addAccount,
+                            )
+                        addAccountButton.pack(pady = standardYPadding)
 
                     def deleteUserAccount():
                         1
