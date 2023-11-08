@@ -2903,93 +2903,8 @@ def Q_Store_Software_07():
                                     errorButton.pack(pady= standardYPadding)
 
                                 else:
-                                    if password == "":
-                                        if confirmedPassword == "":
-                                            if secretQuestion == "":
-                                                if secretQuestionAnswer == "":
-                                                    #Creating an error window
-                                                    errorWindow= ctk.CTkToplevel(root)
-                                                    errorWindow.title("Error Window")
-                                                    errorWindow.geometry("1200x500")
-                                                    errorWindow.transient(root)
-                                                    errorWindow.lift()
-                                                    
-                                                    #Creating a label
-                                                    errorLabel= ctk.CTkLabel(
-                                                        errorWindow,
-                                                        text= "You have left a field empty",
-                                                        font= standardFont
-                                                        )
-                                                    errorLabel.pack(pady= standardYPadding)
+                                    if password == "" or confirmedPassword == "" or secretQuestion == "" or secretQuestionAnswer == "":
 
-                                                    #Creating a button
-                                                    errorButton= ctk.CTkButton(
-                                                        errorWindow,
-                                                        text= "Close Window",
-                                                        font= standardFont,
-                                                        width= standardWidth,
-                                                        height= standardHeight,
-                                                        command= errorWindow.destroy
-                                                        )
-                                                    errorButton.pack(pady= standardYPadding)
-
-                                                else:
-                                                    cursor = connection.cursor()
-                                                    cursor.execute(f"INSERT INTO Accounts (CadetID, Username, Password, Account_TypeID, Secret_Question, Secret_Question_Answer) VALUES ('{cadetID}','{username}','{password}','{accountType}','{secretQuestion}','{secretQuestionAnswer}')")
-                                                    connection.commit()
-                                            else:
-                                                #Creating an error window
-                                                errorWindow= ctk.CTkToplevel(root)
-                                                errorWindow.title("Error Window")
-                                                errorWindow.geometry("1200x500")
-                                                errorWindow.transient(root)
-                                                errorWindow.lift()
-                                                
-                                                #Creating a label
-                                                errorLabel= ctk.CTkLabel(
-                                                    errorWindow,
-                                                    text= "You have left a field empty",
-                                                    font= standardFont
-                                                    )
-                                                errorLabel.pack(pady= standardYPadding)
-
-                                                #Creating a button
-                                                errorButton= ctk.CTkButton(
-                                                    errorWindow,
-                                                    text= "Close Window",
-                                                    font= standardFont,
-                                                    width= standardWidth,
-                                                    height= standardHeight,
-                                                    command= errorWindow.destroy
-                                                    )
-                                                errorButton.pack(pady= standardYPadding)
-                                        else:
-                                            #Creating an error window
-                                            errorWindow= ctk.CTkToplevel(root)
-                                            errorWindow.title("Error Window")
-                                            errorWindow.geometry("1200x500")
-                                            errorWindow.transient(root)
-                                            errorWindow.lift()
-                                            
-                                            #Creating a label
-                                            errorLabel= ctk.CTkLabel(
-                                                errorWindow,
-                                                text= "You have left a field empty",
-                                                font= standardFont
-                                                )
-                                            errorLabel.pack(pady= standardYPadding)
-
-                                            #Creating a button
-                                            errorButton= ctk.CTkButton(
-                                                errorWindow,
-                                                text= "Close Window",
-                                                font= standardFont,
-                                                width= standardWidth,
-                                                height= standardHeight,
-                                                command= errorWindow.destroy
-                                                )
-                                            errorButton.pack(pady= standardYPadding)
-                                    else:
                                         #Creating an error window
                                         errorWindow= ctk.CTkToplevel(root)
                                         errorWindow.title("Error Window")
@@ -3015,6 +2930,11 @@ def Q_Store_Software_07():
                                             command= errorWindow.destroy
                                             )
                                         errorButton.pack(pady= standardYPadding)
+
+                                    else:
+                                        cursor = connection.cursor()
+                                        cursor.execute(f"INSERT INTO Accounts (CadetID, Username, Password, Account_TypeID, Secret_Question, Secret_Question_Answer) VALUES ('{cadetID}','{username}','{password}','{accountType}','{secretQuestion}','{secretQuestionAnswer}')")
+                                        connection.commit()
 
                             else:
                                 #Creating an error window
@@ -3046,7 +2966,8 @@ def Q_Store_Software_07():
 
 
 
-
+                        for widgits in rightFrame.winfo_children():
+                            widgits.destroy()
 
                         #Create frame
                         listboxFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
@@ -3122,7 +3043,158 @@ def Q_Store_Software_07():
                         addAccountButton.pack(pady = standardYPadding)
 
                     def deleteUserAccount():
-                        1
+                        #Defines function that checks if user is sure they want to delete person
+                        def AACMember():
+
+                            #Defines function that deletes member from list and there files
+                            def yes():
+                                #Deletes data from the database
+                                cursor = connection.cursor()
+                                cursor.execute(f'DELETE FROM Cadets WHERE CadetID={cadetID}')
+                                connection.commit()
+                                
+                                removeAACMemberOptions()
+
+                                #Closes window  
+                                areYouSureWindow.destroy()
+
+                            #Defines function to continue the program
+                            def no():
+                                #Closes window
+                                areYouSureWindow.destroy()
+
+                            #Gets userse selection
+                            selection = accountsListListbox.curselection()
+
+                            #Gets members name and folder location
+                            AACMember= accountsListListbox.get(selection)
+                            stringAACMember= str(AACMember)
+                            cleanStringAACMember= stringAACMember.replace("(", "").replace("'", "").replace(",", "").replace(" ", "_").replace(")", "")
+                            cadetID = stringAACMember.split()[0]
+
+                            #Creates new window
+                            areYouSureWindow= ctk.CTkToplevel(root, fg_color= "#1f1f1f")
+                            areYouSureWindow.title("Are You Sure")
+                            areYouSureWindow.geometry("1200x500")
+                            areYouSureWindow.transient(root)
+                            areYouSureWindow.lift()
+                            
+                            #Creates label
+                            areYouSureLabel= ctk.CTkLabel(
+                                areYouSureWindow,
+                                text= f"Are You Sure You Want To Remove {cleanStringAACMember}\n\n This Will Permanently Remove All Information For This Person",
+                                font= standardFont
+                                )
+                            areYouSureLabel.pack(pady= standardYPadding)
+
+                            #Creates a frame
+                            buttonFrame= ctk.CTkFrame(areYouSureWindow, fg_color= "#1f1f1f")
+                            buttonFrame.pack()
+
+                            #Creates a buttonto call a function
+                            yesButton= ctk.CTkButton(
+                                buttonFrame,
+                                text= "Yes",
+                                font= standardFont,
+                                width= standardWidth,
+                                height= standardHeight,
+                                command= yes
+                                )
+                            yesButton.pack(pady= standardYPadding, padx= 10, side='left')
+
+                            #Creates a buttonto call a function
+                            noButton= ctk.CTkButton(
+                                buttonFrame,
+                                text= "No",
+                                font= standardFont,
+                                width= standardWidth,
+                                height= standardHeight,
+                                command= no
+                                )
+                            noButton.pack(pady= standardYPadding, padx= 10, side='left')
+
+                        #Checks if they select a person
+                        def selectionChecker():
+                            #Gets user selection
+                            accountSelection= accountsListListbox.curselection()
+                            #Checks if there is not a selection
+                            if not accountSelection:
+                                #Creates error widnow
+                                errorWindow= ctk.CTkToplevel(root)
+                                errorWindow.title("Error Window")
+                                errorWindow.geometry("1200x500")
+                                errorWindow.transient(root)
+                                errorWindow.lift()
+                                
+                                #Creates a label
+                                errorLabel= ctk.CTkLabel(
+                                    errorWindow,
+                                    text= "You have not selected an account, Please try again.",
+                                    font= standardFont
+                                    )
+                                errorLabel.pack(pady= standardYPadding)
+
+                                #Creates a button
+                                errorButton= ctk.CTkButton(
+                                    errorWindow,
+                                    text= "Close Window",
+                                    font= standardFont,
+                                    width= standardWidth,
+                                    height= standardHeight,
+                                    command= errorWindow.destroy
+                                    )
+                                errorButton.pack(pady= standardYPadding)
+
+                                #Runs if the user did select a name and calls a function
+                            else:
+                                deleteAccount()
+
+                        #Deletes all widgits
+                        for widgets in middleFrame.winfo_children():
+                            widgets.destroy()
+                        for widgets in rightFrame.winfo_children():
+                            widgets.destroy()
+
+                        #Creates a label
+                        label= ctk.CTkLabel(middleFrame, text="Select the person you wish to remove", font= standardFont)
+                        label.pack(pady = standardYPadding)
+
+                        #Create frame
+                        listboxFrame= ctk.CTkFrame(middleFrame, fg_color= "#292929")
+                        listboxFrame.pack(pady = standardYPadding)
+
+                        #Creates list box and fills it with members names using SQL
+                        accountsListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 30, height= 25, font= standardFont)
+                        cursor = connection.cursor()
+                        data = cursor.execute("""
+                        SELECT Accounts.AccountID,Cadets.Rank||' '||Cadets.First_Name||' '||Cadets.Last_Name,Accounts.Username 
+                        FROM Accounts
+                        INNER JOIN Cadets
+                        ON Accounts.CadetID = Cadets.CadetID
+                        """).fetchall()
+                        formatted_data = []
+                        for row in data:
+                            formatted_data.append(' '.join(map(str, row)))
+                        for row in formatted_data:
+                            accountsListListbox.insert(END, row)
+                        accountsListListbox.pack(side=LEFT)
+
+                        #Creates scroll bar
+                        listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=accountsListListbox.yview)
+                        listboxScrollbar.pack(side="right", fill=Y)
+                        accountsListListbox.config(yscrollcommand=listboxScrollbar.set)        
+
+                        #Creates button to call a function
+                        removeAccountButton = ctk.CTkButton(
+                            middleFrame,
+                            text= "Remove Account From List",
+                            font= standardFont,
+                            width= standardWidth,
+                            height= standardHeight,
+                            command= selectionChecker,
+                            )
+                        removeAccountButton.pack(pady = standardYPadding)
+
 
                     def changeSecretQuestion():
                         1

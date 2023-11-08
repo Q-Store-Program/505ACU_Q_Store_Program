@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "505_ACU_Q-Store_Database",
+            "database": "${workspaceFolder:505ACU_Q_Store_Program}/505_ACU_Q-Store_Database.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
