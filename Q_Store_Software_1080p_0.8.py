@@ -3797,7 +3797,7 @@ def Program():
     #Defines the function to close the program
     def closeProgram():
         #Closes database connection and the program
-        with closing(sqlite3.connect("505_ACU_Q-Store_Database.db")) as connection:
+        with closing(sqlite3.connect("505_ACU_Q-Store_Database.db")):
             root.destroy()
 
 

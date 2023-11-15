@@ -1,5 +1,5 @@
 CREATE TABLE "Cadets" (
-CadetID integer PRIMARY KEY autoincrement NOT NULL,
+CadetID integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 Rank integer NOT NULL,
 First_Name TEXT NOT NULL,
 Last_Name TEXT NOT NULL,
@@ -51,3 +51,11 @@ Secret_Question TEXT NOT NULL,
 Secret_Question_Answer TEXT NOT NULL,
 CONSTRAINT Accounts_FK_1 FOREIGN KEY (CadetID) REFERENCES Cadets(CadetID),
 CONSTRAINT Accounts_FK_2 FOREIGN KEY (Account_TypeID) REFERENCES Account_Type(Account_TypeID));
+
+CREATE TABLE "Logs" (
+LogID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+AccountID INTEGER NOT NULL,
+Date DATE NOT NULL,
+Action TEXT NOT NULL,
+CONSTRAINT Accounts_FK_2 FOREIGN KEY (Account_TypeID) REFERENCES Account_Type(Account_TypeID));
+
