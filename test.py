@@ -56,7 +56,6 @@ def createLogInWindow():
     passwordLabel.pack(pady=standardYPadding)
 
     # Creates a ctk entry box
-    global usernameEntry
     usernameEntry = ctk.CTkEntry(
         leftTopFrame,
         placeholder_text="Enter Username",
@@ -67,7 +66,6 @@ def createLogInWindow():
     usernameEntry.pack(pady=standardYPadding)
 
     # Creates a ctk entry box
-    global passwordEntry
     passwordEntry = ctk.CTkEntry(
         leftTopFrame,
         placeholder_text="Enter Password",
@@ -85,7 +83,7 @@ def createLogInWindow():
         font=standardFont,
         width=standardWidth,
         height=standardHeight,
-        command=logIn
+        command=lambda: startLogIn(usernameEntry,passwordEntry)
     )
     logInButton.pack(pady=standardYPadding)
 
@@ -96,7 +94,7 @@ def createLogInWindow():
         font=standardFont,
         width=standardWidth,
         height=standardHeight,
-        command=forgotPassword
+        command=startForgotPassword
     )
     forgotPasswordButton.pack(pady=standardYPadding)
 
@@ -112,7 +110,7 @@ def createLogInWindow():
     closeProgramButton.pack(pady=standardYPadding)
 
 
-def logIn(usernameEntry, passwordEntry):
+def startLogIn(usernameEntry,passwordEntry):
     usernames = []
     cursor = connection.cursor()
     data = cursor.execute(f"SELECT Username FROM Accounts").fetchall()
@@ -122,7 +120,6 @@ def logIn(usernameEntry, passwordEntry):
     for username in data:
         usernames.append(username)
     userUsernameEntry = usernameEntry.get()
-
     if userUsernameEntry not in usernames:
 
         for widgets in leftTopFrame.winfo_children():
@@ -179,7 +176,7 @@ def logIn(usernameEntry, passwordEntry):
             Program()
 
 
-def forgotPassword():
+def startForgotPassword():
     for widgets in leftTopFrame.winfo_children():
         widgets.destroy()
 
@@ -200,7 +197,7 @@ def forgotPassword():
         font=standardFont,
         width=400,
         height=standardHeight,
-        command=lambda: getPassword(usernameEntry)
+        command=lambda: startGetPassword(usernameEntry)
     )
     usernameCheckerButton.pack(pady=standardYPadding)
 
@@ -215,10 +212,8 @@ def forgotPassword():
     )
     returnToLogInButton.pack(pady=standardYPadding)
 
-    return usernameEntry
 
-
-def getPassword(usernameEntry):
+def startGetPassword(usernameEntry):
     usernames = []
     cursor = connection.cursor()
     data = cursor.execute(f"SELECT Username FROM Accounts WHERE Account_TypeID = 2").fetchall()
@@ -291,7 +286,7 @@ def getPassword(usernameEntry):
             font=standardFont,
             width=400,
             height=standardHeight,
-            command=lambda: questionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword)
+            command=lambda: startLogInQuestionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword)
         )
         questionCheckerButton.pack(pady=standardYPadding)
 
@@ -309,7 +304,7 @@ def getPassword(usernameEntry):
         return accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword
 
 
-def questionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword):
+def startLogInQuestionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword):
     questionAnswer = accountQuestionAnswer.get()
 
     if questionAnswer != accountSecretQuestionAnswer:
@@ -331,7 +326,7 @@ def questionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountP
             font=standardFont,
             width=standardWidth,
             height=standardHeight,
-            command=forgotPassword
+            command=startForgotPassword
         )
         errorButton.pack(pady=standardYPadding)
 
@@ -393,7 +388,7 @@ def Program():
         font= (standardFont),
         width= standardWidth,
         height= standardHeight,
-        command= lambda: orderingOptions(AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,closeWindow),
+        command= orderingOptions,
         )
     orderingOptionsButton.pack(pady = standardYPadding)
 
@@ -814,12 +809,12 @@ def changeRankOptions():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command= lambda: selectionChecker(namesListListbox,formatted_data,newRankEntry),
+        command= lambda: rankSelectionChecker(namesListListbox,formatted_data,newRankEntry),
         )
     changeRankButton.pack(pady = standardYPadding)
 
 
-def selectionChecker(namesListListbox,formatted_data,newRankEntry):
+def rankSelectionChecker(namesListListbox,formatted_data,newRankEntry):
     #Getting user listbox selection
     rankNameSelection= namesListListbox.curselection()
     #Looking if there was no selection
@@ -943,22 +938,22 @@ def listStores():
         font= standardFont,
         width= 300,
         height= standardHeight,
-        command=action,
+        command=listStoresAction,
         )
         buttonDict[item].pack(pady = 5)
 
 
-def action(item): 
-    return text_updation(item)
+def listStoresAction(item): 
+    return listStoresTextUpdation(item)
 
 
-def text_updation(categoryName):
+def listStoresTextUpdation(categoryName):
            
     categoryID = categoryName[0]
-    return viewStores(categoryID)
+    return listStoresViewStores(categoryID)
 
 
-def viewStores(categoryID):
+def listStoresViewStores(categoryID):
 
     #Clear all widgits in right frame
     for widgets in rightFrame.winfo_children():
@@ -1013,12 +1008,12 @@ def viewStores(categoryID):
         font= standardFont,
         width= 150,
         height= standardHeight,
-        command= lambda: updateQuantity(storesListListbox,formatted_data,newQuantityEntry),
+        command= lambda: listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry),
         )
     changeQuantityButton.pack(side= "right", padx = 10)
  
 
-def updateQuantity(storesListListbox,formatted_data,newQuantityEntry):
+def listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry):
 
     #Gets lsit box selection
     rowSelection = storesListListbox.curselection()
@@ -1036,7 +1031,7 @@ def updateQuantity(storesListListbox,formatted_data,newQuantityEntry):
         connection.commit()
 
     #Call the function
-    viewStores()
+    listStoresViewStores()
 
 
 ##################################################################################################################
@@ -1051,9 +1046,6 @@ def orderingOptions():
         widgets.destroy()
     for widgets in rightFrame.winfo_children():
         widgets.destroy()
-
-    #Defines function where all stores are listed
-                
 
     #Creates a ctk label
     label = ctk.CTkLabel(leftBottomFrame, text="Select The Person Ordering", fg_color="transparent", font= standardFont)
@@ -1086,7 +1078,7 @@ def orderingOptions():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command= lambda: selectedPersonOrdering(namesListListbox,selectPersonOrderingButton),
+        command= lambda: selectedPersonOrdering(namesListListbox),
         )
     selectPersonOrderingButton.pack(pady = standardYPadding)
 
@@ -1699,7 +1691,7 @@ def storesList():
         font= standardFont,
         width= 300,
         height= standardHeight,
-        command=action,
+        command=ordersAction,
         )
         buttonDict[item].pack(pady = 5)
         
@@ -1810,11 +1802,11 @@ def storesList():
     confirmOrderBotton.pack(pady = standardYPadding)
 
 
-def action(item): 
-    return text_updation(item)
+def ordersAction(item): 
+    return ordersTextUpdation(item)
 
 
-def text_updation(categoryName):
+def ordersTextUpdation(categoryName):
         
     categoryID = categoryName[0]
     return selcetedCategory(categoryID)
@@ -2232,6 +2224,7 @@ def adminOptions():
         widgets.destroy()
 
     #Creates a ctk window
+    global passwordWindow
     passwordWindow= ctk.CTkToplevel(root)
     passwordWindow.title("Log In Window")
     passwordWindow.geometry("500x300")
@@ -2250,6 +2243,7 @@ def adminOptions():
     passwordLabel.pack(pady= standardYPadding)
 
     #Creates a ctk entry box
+    global passwordEntry
     passwordEntry= ctk.CTkEntry(
         passwordWindow,
         placeholder_text="Enter Pasword",
@@ -2267,7 +2261,7 @@ def adminOptions():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: logIn(passwordWindow,passwordEntry)
+        command=logIn
         )
     passwordButton.pack(pady= standardYPadding)
 
@@ -2547,12 +2541,12 @@ def removeAACMemberOptions():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: selectionChecker(namesListListbox),
+        command=lambda: removeMemberSelectionChecker(namesListListbox),
         )
     removeAACMemberButton.pack(pady = standardYPadding)
 
 
-def selectionChecker(namesListListbox):
+def removeMemberSelectionChecker(namesListListbox):
     #Gets user selection
     rankNameSelection= namesListListbox.curselection()
     #Checks if there is not a selection
@@ -2625,7 +2619,7 @@ def AACMember(namesListListbox):
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command= lambda: yes(cadetID,areYouSureWindow)
+        command= lambda: removeMemberYes(cadetID,areYouSureWindow)
         )
     yesButton.pack(pady= standardYPadding, padx= 10, side='left')
 
@@ -2641,7 +2635,7 @@ def AACMember(namesListListbox):
     noButton.pack(pady= standardYPadding, padx= 10, side='left')
 
 
-def yes(cadetID,areYouSureWindow):
+def removeMemberYes(cadetID,areYouSureWindow):
     #Deletes data from the database
     cursor = connection.cursor()
     cursor.execute(f'DELETE FROM Cadets WHERE CadetID={cadetID}')
@@ -2702,12 +2696,12 @@ def changeIDOptions():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: selectionChecker(namesListListbox,newIDEntry),
+        command=lambda: changeIDSelectionChecker(namesListListbox,newIDEntry),
         )
     changeRankButton.pack(pady = standardYPadding)
 
 
-def selectionChecker(namesListListbox):
+def changeIDSelectionChecker(namesListListbox):
     #Getting user listbox selection
     rankNameSelection= namesListListbox.curselection()
     #Looking if there was no selection
@@ -2805,22 +2799,22 @@ def removeStoreOptions():
         font= standardFont,
         width= 300,
         height= standardHeight,
-        command=action,
+        command=removeStoresAction,
         )
         buttonDict[item].pack(pady = 5)
 
 
-def action(item): 
-    return text_updation(item)
+def removeStoresAction(item): 
+    return removeStoreTextUpdation(item)
 
 
-def text_updation(categoryName):
+def removeStoreTextUpdation(categoryName):
 
     CategoryID= categoryName[0]
-    return viewStores(CategoryID)
+    return removeStoreViewStores(CategoryID)
 
 
-def viewStores(CategoryID):
+def removeStoreViewStores(CategoryID):
                
     #Makes variables global
     global SQLCommand
@@ -2874,12 +2868,12 @@ def rightFrameWidgits():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: selectionChecker(storesListbox),
+        command=lambda: removeStoreSelectionChecker(storesListbox),
         )
     removeAACMemberButton.pack(pady = standardYPadding)
 
 
-def selectionChecker(storesListbox):
+def removeStoreSelectionChecker(storesListbox):
                                 
     #Gets user selection
     itemSelection= storesListbox.curselection()
@@ -2949,7 +2943,7 @@ def removeItem(storesListbox,itemSelection):
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: yes(StoreID,areYouSureWindow)
+        command=lambda: removeStoreYes(StoreID,areYouSureWindow)
         )
     yesButton.pack(pady= standardYPadding, padx= 10, side='left')
 
@@ -2965,7 +2959,7 @@ def removeItem(storesListbox,itemSelection):
     noButton.pack(pady= standardYPadding, padx= 10, side='left')
 
 
-def yes(StoreID,areYouSureWindow):
+def removeStoreYes(StoreID,areYouSureWindow):
     #Deletes data from the database
     cursor = connection.cursor()
     cursor.execute(f'DELETE FROM Stores WHERE StoreID={StoreID}')
@@ -2974,7 +2968,7 @@ def yes(StoreID,areYouSureWindow):
     areYouSureWindow.destroy()
     for widgets in rightFrame.winfo_children():
         widgets.destroy()
-    viewStores()
+    removeStoreViewStores()
 
 #-----------------------------------------------------------------------------------------------------------------
 
@@ -3011,7 +3005,7 @@ def addStoresOptions():
     for item in data:
                 
         def action(x = item): 
-            return text_updation(x)
+            return addStoreTextUpdation(x)
 
         category = item[1]
 
@@ -3026,13 +3020,13 @@ def addStoresOptions():
         buttonDict[item].pack(pady = 5)
 
 
-def text_updation(categoryName):
+def addStoreTextUpdation(categoryName):
                         
     categoryID = categoryName[0]
-    return viewStores(categoryID)
+    return addStoreViewStores(categoryID)
 
 
-def viewStores(categoryID):
+def addStoreViewStores(categoryID):
 
     #Clear all widgits in right frame
     for widgets in rightFrame.winfo_children():
@@ -3153,7 +3147,7 @@ def addItem(itemNameEntry,itemSizeEntry,itemQuantityEntry,categoryID):
             connection.commit()
 
     #Call the function
-    viewStores()
+    addStoreViewStores()
 
 #-----------------------------------------------------------------------------------------------------------------
 
@@ -3245,12 +3239,12 @@ def changeSecretQuestionOptions():
         font= standardFont,
         width= 500,
         height= standardHeight,
-        command=lambda: updateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox),
+        command=lambda: adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox),
         )
     changeQuantityButton.pack(pady = standardYPadding)
 
 
-def updateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox):
+def adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox):
                             
     replacementQuestion= questionEntry.get()
     replacementAnswer= questionAnswerEntry.get()
@@ -3417,12 +3411,12 @@ def changePasswordOptions():
         font= standardFont,
         width= 500,
         height= standardHeight,
-        command=lambda: passwordChecker(adminAccountOldPassword,adminAccountNewPassword,adminAccountNewPasswordConfirm,adminAccountPassword,AccountID),
+        command=lambda: adminAccountPasswordChecker(adminAccountOldPassword,adminAccountNewPassword,adminAccountNewPasswordConfirm,adminAccountPassword,AccountID),
         )
     changeQuantityButton.pack(pady = standardYPadding)
 
 
-def passwordChecker(adminAccountOldPassword,adminAccountNewPassword,adminAccountNewPasswordConfirm,adminAccountPassword,AccountID):
+def adminAccountPasswordChecker(adminAccountOldPassword,adminAccountNewPassword,adminAccountNewPasswordConfirm,adminAccountPassword,AccountID):
 
     adminOldPassword= adminAccountOldPassword.get()
     adminNewPassword= adminAccountNewPassword.get()
@@ -3848,7 +3842,7 @@ def deleteAccount(accountsListListbox):
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: yes(accountID,areYouSureWindow)
+        command=lambda: deleteUserAccountYes(accountID,areYouSureWindow)
         )
     yesButton.pack(pady= standardYPadding, padx= 10, side='left')
 
@@ -3864,7 +3858,7 @@ def deleteAccount(accountsListListbox):
     noButton.pack(pady= standardYPadding, padx= 10, side='left')
 
 
-def yes(accountID,areYouSureWindow):
+def deleteUserAccountYes(accountID,areYouSureWindow):
 
     #Deletes data from the database
     cursor = connection.cursor()
