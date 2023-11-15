@@ -1,7 +1,7 @@
 {
 	"folders": {},
 	"connections": {
-		"sqlite_jdbc-18b947bb103-32720d6579c5f822": {
+		"sqlite_jdbc-18ba29ce5ca-3e63e2052b694102": {
 			"provider": "sqlite",
 			"driver": "sqlite_jdbc",
 			"name": "505_ACU_Q-Store_Database.db",
@@ -9,19 +9,6 @@
 			"configuration": {
 				"database": "C:\\Users\\alecj\\OneDrive - Great Southern Grammar\\.Cadet\\Q_Store\\505ACU_Q_Store_Program\\505_ACU_Q-Store_Database.db",
 				"url": "jdbc:sqlite:C:\\Users\\alecj\\OneDrive - Great Southern Grammar\\.Cadet\\Q_Store\\505ACU_Q_Store_Program\\505_ACU_Q-Store_Database.db",
-				"configurationType": "MANUAL",
-				"type": "dev",
-				"auth-model": "native"
-			}
-		},
-		"sqlite_jdbc-18ba29ce5ca-3e63e2052b694102": {
-			"provider": "sqlite",
-			"driver": "sqlite_jdbc",
-			"name": "505_ACU_Q-Store_Database.db 2",
-			"save-password": true,
-			"configuration": {
-				"database": "C:\\Users\\alec.mcdonald\\OneDrive - Great Southern Grammar\\.Cadet\\Q_Store\\505ACU_Q_Store_Program\\505_ACU_Q-Store_Database.db",
-				"url": "jdbc:sqlite:C:\\Users\\alec.mcdonald\\OneDrive - Great Southern Grammar\\.Cadet\\Q_Store\\505ACU_Q_Store_Program\\505_ACU_Q-Store_Database.db",
 				"configurationType": "MANUAL",
 				"type": "dev",
 				"auth-model": "native"

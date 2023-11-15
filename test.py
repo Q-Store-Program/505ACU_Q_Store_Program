@@ -360,6 +360,7 @@ def Program():
     startLabel.pack(pady = standardYPadding)
 
     #Creates a button
+    global AACMemberOptionsButton
     AACMemberOptionsButton = ctk.CTkButton(
         leftTopFrame,
         text= "AAC Member Options",
@@ -371,6 +372,7 @@ def Program():
     AACMemberOptionsButton.pack(pady = standardYPadding)
 
     #Creates a button
+    global listOfStoresButton
     listOfStoresButton = ctk.CTkButton(
         leftTopFrame,
         text= "List Of Stores",
@@ -382,6 +384,7 @@ def Program():
     listOfStoresButton.pack(pady = standardYPadding)
 
     #Creates a button
+    global orderingOptionsButton
     orderingOptionsButton = ctk.CTkButton(
         leftTopFrame,
         text= "Ordering Options",
@@ -393,6 +396,7 @@ def Program():
     orderingOptionsButton.pack(pady = standardYPadding)
 
     #Creates a button
+    global storesReturnsButton
     storesReturnsButton = ctk.CTkButton(
         leftTopFrame,
         text= "Stores Returns",
@@ -404,6 +408,7 @@ def Program():
     storesReturnsButton.pack(pady = standardYPadding)
 
     #Creates a button 
+    global adminButton
     adminButton = ctk.CTkButton(
         leftTopFrame,
         text= "Admin Options",
@@ -415,6 +420,7 @@ def Program():
     adminButton.pack(pady = standardYPadding)
 
     #Creates a button 
+    global closeWindow
     closeWindow = ctk.CTkButton(
         leftTopFrame, 
         text="Close Window", 
@@ -537,7 +543,7 @@ def addAACMemberOptions():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command= lambda: addPerson(rightFrame,first_inital,nameEntry),
+        command= lambda: addPerson(rankEntry,first_inital,nameEntry),
         )
     addPersonButton.pack(pady = standardYPadding)
 
@@ -932,6 +938,9 @@ def listStores():
 
         category = item[1]
 
+        def listStoresAction(x = item): 
+            return listStoresTextUpdation(x)
+
         buttonDict[item] = ctk.CTkButton(
         buttonFrame,
         text= category,
@@ -943,14 +952,10 @@ def listStores():
         buttonDict[item].pack(pady = 5)
 
 
-def listStoresAction(item): 
-    return listStoresTextUpdation(item)
-
-
 def listStoresTextUpdation(categoryName):
            
     categoryID = categoryName[0]
-    return listStoresViewStores(categoryID)
+    listStoresViewStores(categoryID)
 
 
 def listStoresViewStores(categoryID):
@@ -1008,12 +1013,12 @@ def listStoresViewStores(categoryID):
         font= standardFont,
         width= 150,
         height= standardHeight,
-        command= lambda: listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry),
+        command= lambda: listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry,categoryID),
         )
     changeQuantityButton.pack(side= "right", padx = 10)
  
 
-def listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry):
+def listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry,categoryID):
 
     #Gets lsit box selection
     rowSelection = storesListListbox.curselection()
@@ -1031,7 +1036,7 @@ def listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry):
         connection.commit()
 
     #Call the function
-    listStoresViewStores()
+    listStoresViewStores(categoryID)
 
 
 ##################################################################################################################
@@ -1072,6 +1077,7 @@ def orderingOptions():
     namesListListbox.config(yscrollcommand=listboxScrollbar.set)        
 
     #Creates a ctk button
+    global selectPersonOrderingButton
     selectPersonOrderingButton = ctk.CTkButton(
         leftBottomFrame,
         text= "Select Person Ordering",
@@ -1095,7 +1101,7 @@ def ordering():
     confirmOrderBotton.configure(command=confirmedOrder)
 
 
-def addToOrder(AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,closeWindow):
+def addToOrder():
     #Gets list box selection
     selection = storesListListbox.curselection()
 
@@ -1170,7 +1176,7 @@ def addToOrder(AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,s
                 storesListListbox.insert(END, row)
             
             #Creates button list and calls the variable
-            button_list = [AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,closeWindow]
+            button_list = [AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,adminButton,closeWindow]
             check_listbox_empty(ordersListbox, button_list)
 
 
@@ -1195,105 +1201,81 @@ def check_listbox_empty(listbox, button_list):
         enable_all_buttons(button_list)
 
 
-def removeFromOrder(AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,closeWindow):
+def removeFromOrder():
                 
     #Gets celection from the listbox
     selection = ordersListbox.curselection()
     #If there is a selection it gets selected value in the listbox and turns it into a string and splits it into useful values saved as variables
     if selection:
-        itemListBox = storesListListbox.get(selection[0]) 
+        itemListBox = ordersListbox.get(selection[0]) 
         itemString = str(itemListBox)
         itemID = itemString.split(',')[0].strip().replace("'","").replace(")","")
-        itemQuantity = itemString.split(',')[2].strip().replace("'","").replace(")","")
-        itemQuantityInt = int(itemQuantity)
         item = itemString.split(',')[1].strip().replace("'","").replace(")","")
         item = itemID+', '+item
-        qty_sale = "1" 
             
-        if itemQuantityInt < int(qty_sale):
-            #Creates error window
-            errorWindow= ctk.CTkToplevel(root)
-            errorWindow.title("Error Window")
-            errorWindow.geometry("1200x500")
-            errorWindow.transient(root)
-            errorWindow.lift()
+        cursor = connection.cursor()
+        itemQuantity=cursor.execute(f"SELECT Qty FROM Stores WHERE StoreID={itemID}").fetchall()
+        connection.commit()
 
-            #Creates a label
-            errorLabel= ctk.CTkLabel(
-                errorWindow,
-                text= "Not enough items in stock",
-                font= standardFont
-                )
-            errorLabel.pack(pady= standardYPadding)
+        #Deletes selected item from listbox
+        ordersListbox.delete(selection[0])
+        #Makes variable global
+        global saveOrdersListbox
+        #Gets item selected in listbox
+        saveOrdersListbox = ordersListbox.get(0, END)
 
-            #Creates a button
-            errorButton= ctk.CTkButton(
-                errorWindow,
-                text= "Close Window",
-                font= standardFont,
-                width= standardWidth,
-                height= standardHeight,
-                command= errorWindow.destroy
-                )
-            errorButton.pack(pady= standardYPadding)
-        #If quantity required is less/same than current quantity
-        else:
-            #Deletes selected item from listbox
-            ordersListbox.delete(selection[0])
-            #Makes variable global
-            global saveOrdersListbox
-            #Gets item selected in listbox
-            saveOrdersListbox = ordersListbox.get(0, END)
-            #Adds 1 to current value
-            newItemQuantity = str(itemQuantityInt + 1)
-            
-            #Updates database using SQL
-            cursor = connection.cursor()
-            cursor.execute(f"UPDATE Stores SET Qty='{newItemQuantity}' WHERE StoreID={itemID}")
-            connection.commit()
+        itemQuantity=str(itemQuantity).replace("'","").replace("[","").replace("(","").replace(",","").replace(")","").replace("]","")
+        itemQuantity=int(itemQuantity)
+        #Adds 1 to current value
+        newItemQuantity = str(itemQuantity + 1)
+        
+        #Updates database using SQL
+        cursor = connection.cursor()
+        cursor.execute(f"UPDATE Stores SET Qty='{newItemQuantity}' WHERE StoreID={itemID}")
+        connection.commit()
 
-            #Retrieves data from database to be inserted into listbox
-            cursor = connection.cursor()
-            data = cursor.execute(SQLCommand).fetchall()
-            formatted_data = []
-            for item in data:
-                store_id = item[0]
-                name = item[1]
-                size = item[2] if item[2] is not None else 'N/A'
-                qty = item[3]
-                formatted_data.append(f"{store_id}, {name} {size}, {qty}")
+        #Retrieves data from database to be inserted into listbox
+        cursor = connection.cursor()
+        data = cursor.execute(SQLCommand).fetchall()
+        formatted_data = []
+        for item in data:
+            store_id = item[0]
+            name = item[1]
+            size = item[2] if item[2] is not None else 'N/A'
+            qty = item[3]
+            formatted_data.append(f"{store_id}, {name} {size}, {qty}")
 
-            #Deletes all contents in listbox and inserts contents of database into the now empty listbox
-            storesListListbox.delete(0, END)
-            for row in formatted_data:
-                storesListListbox.insert(END, row)
-            
-            #Defines variable to disable buttons
-            def disable_buttons_except_one(button_list):     
-                #Disables all buttons in button list 
-                for button in button_list:
-                    button.configure(state= DISABLED)
+        #Deletes all contents in listbox and inserts contents of database into the now empty listbox
+        storesListListbox.delete(0, END)
+        for row in formatted_data:
+            storesListListbox.insert(END, row)
+        
+        #Defines variable to disable buttons
+        def disable_buttons_except_one(button_list):     
+            #Disables all buttons in button list 
+            for button in button_list:
+                button.configure(state= DISABLED)
 
 
-            #Defines variable to enable buttons
-            def enable_all_buttons(button_list):
-                #Enables all buttons in button list 
-                for button in button_list:
-                    button.configure(state= NORMAL)
+        #Defines variable to enable buttons
+        def enable_all_buttons(button_list):
+            #Enables all buttons in button list 
+            for button in button_list:
+                button.configure(state= NORMAL)
 
 
-            #Defines variable to disable buttons
-            def check_listbox_empty(listbox, button_list):
-                #Checks if listbox has more than 0 items in it and calls the function
-                if listbox.size() > 0:
-                    disable_buttons_except_one(button_list)
-                #Checks if has 0 or less items in it and calls the function
-                else:
-                    enable_all_buttons(button_list)
-            
-            #Creates button list and calls the variable
-            button_list = [AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,closeWindow]
-            check_listbox_empty(ordersListbox, button_list)
+        #Defines variable to disable buttons
+        def check_listbox_empty(listbox, button_list):
+            #Checks if listbox has more than 0 items in it and calls the function
+            if listbox.size() > 0:
+                disable_buttons_except_one(button_list)
+            #Checks if has 0 or less items in it and calls the function
+            else:
+                enable_all_buttons(button_list)
+        
+        #Creates button list and calls the variable
+        button_list = [AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,adminButton,closeWindow]
+        check_listbox_empty(ordersListbox, button_list)
 
 
 def shortTermCheckboxEvent():
@@ -1410,7 +1392,7 @@ def longTermCheckboxEvent():
         widgets.destroy()
 
 
-def confirmedOrder(AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,closeWindow):
+def confirmedOrder():
     #Gets selection from the listboxs
     resultShort= shortTermCheckbox.get()
     resultLong= longTermCheckbox.get()
@@ -1448,7 +1430,7 @@ def confirmedOrder(AACMemberOptionsButton,listOfStoresButton,orderingOptionsButt
         #Checks if long term checkbox was not selected
         elif resultLong == 0:
             #Defines the list
-            button_list = [AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,closeWindow]
+            button_list = [AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,adminButton,closeWindow]
             #Goes through the list and enables the buttons
             for button in button_list:
                 button.configure(state= NORMAL)
@@ -1684,6 +1666,8 @@ def storesList():
     for item in data:
 
         category = item[1]
+        def ordersAction(x=item): 
+            return ordersTextUpdation(x)
 
         buttonDict[item] = ctk.CTkButton(
         buttonFrame,
@@ -1800,10 +1784,6 @@ def storesList():
         height= standardHeight,
         )
     confirmOrderBotton.pack(pady = standardYPadding)
-
-
-def ordersAction(item): 
-    return ordersTextUpdation(item)
 
 
 def ordersTextUpdation(categoryName):
