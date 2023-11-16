@@ -173,6 +173,11 @@ def startLogIn(usernameEntry,passwordEntry):
             passwordErrorButton.pack(pady=standardYPadding)
 
         elif userEnteredPassword == userPassword:
+            date= datetime.datetime.now().strftime("%H:%M:%S %d/%m/%Y")
+            cursor = connection.cursor()
+            data = cursor.execute(f"SELECT AccountID FROM Accounts WHERE Username= '{userUsernameEntry}'").fetchall()
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Action) VALUES ('{data}','{date}','')").fetchall()
             Program()
 
 
