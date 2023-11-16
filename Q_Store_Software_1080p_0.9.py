@@ -1282,7 +1282,7 @@ def shortTermCheckboxEvent():
 
     #Gets the date and time     
     Data_Taken = datetime.datetime.now().strftime("%d/%m/%Y")
-    Log_TypeID='2'
+    Log_TypeID='1'
     
 
     #Setting a variable
@@ -1931,8 +1931,8 @@ def viewLogs():
     longTermLogListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height= 28, font= standardFont)
     #Gets all required data from database using SQL and formats it into desired format
     cursor = connection.cursor()
-    dataLogsLong = cursor.execute(f"SELECT Logs.LogID,Logs.StoreID,Logs.Qty_Taken,Logs.Date_Taken FROM Logs WHERE Logs.Log_TypeID = 1 AND Logs.CadetID = {CadetID};").fetchall()
-    dataInnerJoinLong = cursor.execute(f"SELECT Stores.Name, Logs.StoreID FROM Logs INNER JOIN Stores ON Logs.StoreID = Stores.StoreID WHERE Logs.Log_TypeID = 2 AND Logs.CadetID = {CadetID};").fetchall()
+    dataLogsLong = cursor.execute(f"SELECT Logs.LogID,Logs.StoreID,Logs.Qty_Taken,Logs.Date_Taken FROM Logs WHERE Logs.Log_TypeID = 2 AND Logs.CadetID = {CadetID};").fetchall()
+    #dataInnerJoinLong = cursor.execute(f"SELECT Stores.Name, Logs.StoreID FROM Logs INNER JOIN Stores ON Logs.StoreID = Stores.StoreID WHERE Logs.Log_TypeID = 2 AND Logs.CadetID = {CadetID};").fetchall()
     formatted_dataLong = []
     for itemLogsLong in dataLogsLong:
 
@@ -2003,7 +2003,7 @@ def viewLogs():
     shortTermLogListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height= 28, font= standardFont)
     #Gets all required data from database using SQL and formats it into desired format
     cursor = connection.cursor()
-    dataLogsShort = cursor.execute(f"SELECT Logs.LogID,Logs.StoreID,Logs.Qty_Taken,Logs.Date_Taken FROM Logs WHERE Logs.Log_TypeID = 2 AND Logs.CadetID = {CadetID};").fetchall()
+    dataLogsShort = cursor.execute(f"SELECT Logs.LogID,Logs.StoreID,Logs.Qty_Taken,Logs.Date_Taken FROM Logs WHERE Logs.Log_TypeID = 1 AND Logs.CadetID = {CadetID};").fetchall()
     formatted_dataShort = []
     for itemLogsShort in dataLogsShort:
 
@@ -2241,7 +2241,7 @@ def adminOptions():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=logIn
+        command=lambda: logIn(passwordWindow,passwordEntry)
         )
     passwordButton.pack(pady= standardYPadding)
 
@@ -2304,7 +2304,7 @@ def forgotPassword(passwordWindow):
         font= standardFont,
         width= 400,
         height= standardHeight,
-        command=lambda: questionChecker(adminAccountQuestionAnswer,adminAccountSecretQuestionAnswer,adminAccountPassword),
+        command=lambda: adminLogInQuestionChecker(passwordWindow,adminAccountQuestionAnswer,adminAccountSecretQuestionAnswer,adminAccountPassword),
         )
     questionCheckerButton.pack(pady = standardYPadding)
 
@@ -2325,7 +2325,7 @@ def returnToLogin(passwordWindow):
     adminOptions()
 
 
-def questionChecker(passwordWindow,adminAccountQuestionAnswer,adminAccountSecretQuestionAnswer,adminAccountPassword):
+def adminLogInQuestionChecker(passwordWindow,adminAccountQuestionAnswer,adminAccountSecretQuestionAnswer,adminAccountPassword):
 
     adminQuestionAnswer= adminAccountQuestionAnswer.get()
 
@@ -2367,7 +2367,7 @@ def questionChecker(passwordWindow,adminAccountQuestionAnswer,adminAccountSecret
             font= standardFont,
             width= standardWidth,
             height= standardHeight,
-            command= returnToLogin
+            command=lambda: returnToLogin(passwordWindow)
             )
         returnToLoginButton.pack(pady= standardYPadding)
 
@@ -2559,7 +2559,7 @@ def removeMemberSelectionChecker(namesListListbox):
 
         #Runs if the user did select a name and calls a function
     else:
-        AACMember()
+        AACMember(namesListListbox)
 
 
 def AACMember(namesListListbox):
@@ -2610,7 +2610,7 @@ def AACMember(namesListListbox):
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command= areYouSureWindow.destroy()
+        command=lambda: areYouSureWindow.destroy()
         )
     noButton.pack(pady= standardYPadding, padx= 10, side='left')
 
@@ -2676,12 +2676,12 @@ def changeIDOptions():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: changeIDSelectionChecker(namesListListbox,newIDEntry),
+        command=lambda: changeIDSelectionChecker(namesListListbox,newIDEntry,formatted_data),
         )
     changeRankButton.pack(pady = standardYPadding)
 
 
-def changeIDSelectionChecker(namesListListbox):
+def changeIDSelectionChecker(namesListListbox,newIDEntry,formatted_data):
     #Getting user listbox selection
     rankNameSelection= namesListListbox.curselection()
     #Looking if there was no selection
@@ -2714,10 +2714,10 @@ def changeIDSelectionChecker(namesListListbox):
     #Looking if there was a selection
     else:
         #Calling the function
-        updateID()
+        updateID(namesListListbox,newIDEntry,formatted_data)
 
 
-def updateID(namesListListbox,newIDEntry):
+def updateID(namesListListbox,newIDEntry,formatted_data):
 
     #Gets user selection
     rowSelectionRank = namesListListbox.curselection()
@@ -2773,6 +2773,9 @@ def removeStoreOptions():
 
         category = item[1]
 
+        def removeStoresAction(x=item): 
+            return removeStoreTextUpdation(x)
+
         buttonDict[item] = ctk.CTkButton(
         buttonFrame,
         text= category,
@@ -2784,27 +2787,23 @@ def removeStoreOptions():
         buttonDict[item].pack(pady = 5)
 
 
-def removeStoresAction(item): 
-    return removeStoreTextUpdation(item)
-
-
 def removeStoreTextUpdation(categoryName):
+    global removeStoreCategoryID
+    removeStoreCategoryID= categoryName[0]
+    return removeStoreViewStores(removeStoreCategoryID)
 
-    CategoryID= categoryName[0]
-    return removeStoreViewStores(CategoryID)
 
-
-def removeStoreViewStores(CategoryID):
+def removeStoreViewStores(removeStoreCategoryID):
                
     #Makes variables global
     global SQLCommand
     #Saves the command to a variable
-    SQLCommand = f"SELECT StoreID,Name,Size,Qty FROM Stores WHERE CategoryID={CategoryID}"
+    SQLCommand = f"SELECT StoreID,Name,Size,Qty FROM Stores WHERE CategoryID={removeStoreCategoryID}"
     #Makes variables global
     global formatted_data
     #Selects data from database using SQL
     cursor = connection.cursor()
-    data = cursor.execute(f"SELECT StoreID,Name,Size,Qty FROM Stores WHERE CategoryID={CategoryID}").fetchall()
+    data = cursor.execute(f"SELECT StoreID,Name,Size,Qty FROM Stores WHERE CategoryID={removeStoreCategoryID}").fetchall()
     formatted_data = []
     for item in data:
         store_id = item[0]
@@ -2887,7 +2886,7 @@ def removeStoreSelectionChecker(storesListbox):
 
     #Runs if the user did select a name and calls a function
     else:
-        return removeItem(itemSelection)
+        removeItem(storesListbox,itemSelection)
 
 
 def removeItem(storesListbox,itemSelection):
@@ -2934,7 +2933,7 @@ def removeItem(storesListbox,itemSelection):
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command= areYouSureWindow.destroy()
+        command=lambda: areYouSureWindow.destroy()
         )
     noButton.pack(pady= standardYPadding, padx= 10, side='left')
 
@@ -2948,7 +2947,7 @@ def removeStoreYes(StoreID,areYouSureWindow):
     areYouSureWindow.destroy()
     for widgets in rightFrame.winfo_children():
         widgets.destroy()
-    removeStoreViewStores()
+    removeStoreViewStores(removeStoreCategoryID)
 
 #-----------------------------------------------------------------------------------------------------------------
 
@@ -3077,7 +3076,7 @@ def addStoreViewStores(categoryID):
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: addItem(itemNameEntry,itemSizeEntry,itemQuantityEntry),
+        command=lambda: addItem(itemNameEntry,itemSizeEntry,itemQuantityEntry,categoryID),
         )
     addItemButton.pack(pady = standardYPadding)
                         
@@ -3127,7 +3126,7 @@ def addItem(itemNameEntry,itemSizeEntry,itemQuantityEntry,categoryID):
             connection.commit()
 
     #Call the function
-    addStoreViewStores()
+    addStoreViewStores(categoryID)
 
 #-----------------------------------------------------------------------------------------------------------------
 
@@ -3158,6 +3157,7 @@ def adminAccountOptions():
     )
     changePassword.pack(pady = standardYPadding)
 
+#-----------------------------------------------------------------------------------------------------------------
 
 def changeSecretQuestionOptions():
 
@@ -3266,7 +3266,7 @@ def adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsLi
             
             else:
                 cursor = connection.cursor()
-                cursor.execute(f"UPDATE Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE Admin_AccountID={AccountID}")
+                cursor.execute(f"UPDATE Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE AccountID={AccountID}")
                 connection.commit()
                 changeSecretQuestionOptions()
 
@@ -3333,6 +3333,7 @@ def adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsLi
             )
         errorButton.pack(pady= standardYPadding)
 
+#-----------------------------------------------------------------------------------------------------------------
 
 def changePasswordOptions():
                                       
@@ -3590,12 +3591,12 @@ def addUserAccount():
         font= standardFont,
         width= 500,
         height= standardHeight,
-        command=lambda: addAccount(namesListListbox,passwordEntry,confirmedPasswordEntry,secretQuestionEntry,secretQuestionAnswerEntry),
+        command=lambda: addAccount(namesListListbox,passwordEntry,confirmedPasswordEntry,secretQuestionEntry,secretQuestionAnswerEntry,formatted_data),
         )
     addAccountButton.pack(pady = standardYPadding)
 
 
-def addAccount(namesListListbox,passwordEntry,confirmedPasswordEntry,secretQuestionEntry,secretQuestionAnswerEntry):
+def addAccount(namesListListbox,passwordEntry,confirmedPasswordEntry,secretQuestionEntry,secretQuestionAnswerEntry,formatted_data):
 
     rowSelection = namesListListbox.curselection()
     if rowSelection:
@@ -3701,7 +3702,7 @@ def addAccount(namesListListbox,passwordEntry,confirmedPasswordEntry,secretQuest
             )
         errorButton.pack(pady= standardYPadding)
 
-#-----------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------
 
 def deleteUserAccount():
 
@@ -3782,7 +3783,7 @@ def selectionChecker(accountsListListbox):
 
         #Runs if the user did select a name and calls a function
     else:
-        deleteAccount()
+        deleteAccount(accountsListListbox)
 
 
 def deleteAccount(accountsListListbox):
@@ -3833,7 +3834,7 @@ def deleteAccount(accountsListListbox):
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command= areYouSureWindow.destroy()
+        command=lambda: areYouSureWindow.destroy()
         )
     noButton.pack(pady= standardYPadding, padx= 10, side='left')
 
@@ -3859,7 +3860,7 @@ def changeSecretQuestion():
         widgets.destroy()
 
     #Creates a label
-    label= ctk.CTkLabel(rightFrame, text="Select the account you wish to modify \n FORMAT = Admin Account ID, Secret Question, Secret Question Answer", font= standardFont)
+    label= ctk.CTkLabel(rightFrame, text="Select the account you wish to modify \n FORMAT = Account ID, Username,  Secret Question, Secret Question Answer", font= standardFont)
     label.pack(pady = standardYPadding)
 
     #Creates a frame
@@ -3867,7 +3868,7 @@ def changeSecretQuestion():
     listboxFrame.pack(pady = standardYPadding)
 
     #Create list box and writes the contents of the database into it
-    adminAccountsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height=10, font= standardFont)
+    adminAccountsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 45, height=10, font=("",15))
     cursor = connection.cursor()
     data = cursor.execute(f"SELECT AccountID,Username,Secret_Question,Secret_Question_Answer FROM Accounts WHERE Account_TypeID = 2").fetchall()
     formatted_data = []
