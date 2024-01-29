@@ -147,10 +147,24 @@ def startLogIn(usernameEntry,passwordEntry):
     elif userUsernameEntry in usernames:
         cursor = connection.cursor()
         userPassword = cursor.execute(f"SELECT Password FROM Accounts WHERE Username= '{userUsernameEntry}'").fetchall()
-        userPassword = str(userPassword).replace('(', '').replace(')', '').replace(',', '').replace("'", '').replace(
-            " ", '').replace("[", '').replace("]", '')
+        userPassword = str(userPassword).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
         userEnteredPassword = passwordEntry.get()
         if userEnteredPassword != userPassword:
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            Action= "3"
+            Before= "N/A"
+            After= "N/A"
+            User_Input= userEnteredPassword
+            Remarks= "N/A"
+            cursor = connection.cursor()
+            data = cursor.execute(f"SELECT AccountID FROM Accounts WHERE Username= '{userUsernameEntry}'").fetchall()
+            AccountID=str(data).replace("[","").replace("]","").replace("(","").replace(")","").replace(",","")
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{AccountID}','{Date}','{Time}','{Action}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
+
             for widgets in leftTopFrame.winfo_children():
                 widgets.destroy()
             # Creates a ctk label
@@ -173,11 +187,21 @@ def startLogIn(usernameEntry,passwordEntry):
             passwordErrorButton.pack(pady=standardYPadding)
 
         elif userEnteredPassword == userPassword:
-            date= datetime.datetime.now().strftime("%H:%M:%S %d/%m/%Y")
             cursor = connection.cursor()
             data = cursor.execute(f"SELECT AccountID FROM Accounts WHERE Username= '{userUsernameEntry}'").fetchall()
+            accountID=str(data).replace("[","").replace("]","").replace("(","").replace(")","").replace(",","")
+            global loggedInAccountID
+            loggedInAccountID = accountID
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            Action= "1"
+            Before= "N/A"
+            After= "N/A"
+            User_Input= "N/A"
+            Remarks= "N/A"
             cursor = connection.cursor()
-            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Action) VALUES ('{data}','{date}','')").fetchall()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{Action}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
             Program()
 
 
@@ -221,7 +245,7 @@ def startForgotPassword():
 def startGetPassword(usernameEntry):
     usernames = []
     cursor = connection.cursor()
-    data = cursor.execute(f"SELECT Username FROM Accounts WHERE Account_TypeID = 2").fetchall()
+    data = cursor.execute(f"SELECT Username FROM Accounts").fetchall()
     data = str(data).replace('(', '').replace(')', '').replace(',', '').replace("'", '').replace(" ", ',').replace(
         "[", '').replace("]", '')
     data = data.split(',')
@@ -269,8 +293,7 @@ def startGetPassword(usernameEntry):
             widgets.destroy()
 
         # Creates a ctk label
-        label = ctk.CTkLabel(leftTopFrame, text=f"The secret question is: \n{accountSecretQuestion}", fg_color="transparent",
-                             font=standardFont)
+        label = ctk.CTkLabel(leftTopFrame, text=f"The secret question is: \n{accountSecretQuestion}", fg_color="transparent",font=standardFont)
         label.pack(pady=standardYPadding)
 
         # Creates an entry box
@@ -280,7 +303,6 @@ def startGetPassword(usernameEntry):
             font=standardFont,
             width=400,
             height=standardHeight,
-            show='*'
         )
         accountQuestionAnswer.pack(pady=standardYPadding)
 
@@ -291,7 +313,7 @@ def startGetPassword(usernameEntry):
             font=standardFont,
             width=400,
             height=standardHeight,
-            command=lambda: startLogInQuestionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword)
+            command=lambda: startLogInQuestionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword, userUsernameEntry)
         )
         questionCheckerButton.pack(pady=standardYPadding)
 
@@ -309,12 +331,26 @@ def startGetPassword(usernameEntry):
         return accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword
 
 
-def startLogInQuestionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword):
+def startLogInQuestionChecker(accountQuestionAnswer, accountSecretQuestionAnswer, accountPassword, userUsernameEntry):
     questionAnswer = accountQuestionAnswer.get()
 
     if questionAnswer != accountSecretQuestionAnswer:
         for widgets in leftTopFrame.winfo_children():
             widgets.destroy()
+
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        Action= "9"
+        Before= "N/A"
+        After= "N/A"
+        User_Input= questionAnswer
+        Remarks= "N/A"
+        cursor = connection.cursor()
+        data = cursor.execute(f"SELECT AccountID FROM Accounts WHERE Username= '{userUsernameEntry}'").fetchall()
+        AccountID=str(data).replace("[","").replace("]","").replace("(","").replace(")","").replace(",","")
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{AccountID}','{Date}','{Time}','{Action}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+        connection.commit()
 
         # Creates a label
         errorLabel = ctk.CTkLabel(
@@ -340,9 +376,23 @@ def startLogInQuestionChecker(accountQuestionAnswer, accountSecretQuestionAnswer
             widgets.destroy()
 
         # Creates a ctk label
-        label = ctk.CTkLabel(leftTopFrame, text=f"The Password is: \n{accountPassword}", fg_color="transparent",
-                             font=standardFont)
+        label = ctk.CTkLabel(leftTopFrame, text=f"The Password is: \n{accountPassword}", fg_color="transparent", font=standardFont)
         label.pack(pady=standardYPadding)
+
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        Action= "4"
+        Before= "N/A"
+        After= "N/A"
+        User_Input= "N/A"
+        Remarks= "N/A"
+        cursor = connection.cursor()
+        data = cursor.execute(f"SELECT AccountID FROM Accounts WHERE Username= '{userUsernameEntry}'").fetchall()
+        AccountID=str(data).replace("[","").replace("]","").replace("(","").replace(")","").replace(",","")
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{AccountID}','{Date}','{Time}','{Action}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+        connection.commit()
+        
 
         # Creates a button
         returnToLoginButton = ctk.CTkButton(
@@ -614,7 +664,7 @@ def addPerson(rankEntry,first_inital,nameEntry):
             #Creates label
             errorLabel= ctk.CTkLabel(
                 errorWindow,
-                text= "Invalid Characters Entered For First Initial",
+                text= "Invalid Characters Entered For First Name",
                 font= standardFont
                 )
             errorLabel.pack(pady= standardYPadding)
@@ -673,6 +723,17 @@ def addPerson(rankEntry,first_inital,nameEntry):
 
                 cursor = connection.cursor()
                 cursor.execute(f"INSERT INTO Cadets (rank,first_name,last_name,email) VALUES ('{rank}', '{first}', '{last_name}', '{email}')")
+                connection.commit()
+
+                Date= datetime.datetime.now().strftime("%d/%m/%Y")
+                Time= datetime.datetime.now().strftime("%H:%M:%S")
+                ActionID= "6"
+                Before= "N/A"
+                After= "N/A"
+                User_Input= f"{rank} {first} {last_name}"
+                Remarks= "N/A"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
                 connection.commit()
 
                 #Runs function
@@ -869,9 +930,32 @@ def rankSelectionChecker(namesListListbox,formatted_data,newRankEntry):
             cadetID = rowRankString.split()[0]
             cadeNewRank = newRankEntry.get()
 
+            cursor = connection.cursor()
+            oldRank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID={cadetID}").fetchall()
+            oldRank = str(oldRank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            firstName = cursor.execute(f"SELECT First_Name FROM Cadets WHERE CadetID={cadetID}").fetchall()
+            firstName = str(firstName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            lastName = cursor.execute(f"SELECT Last_Name FROM Cadets WHERE CadetID={cadetID}").fetchall()
+            lastName = str(lastName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
             #Updates rank in database using SQL
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE Cadets SET rank='{cadeNewRank}' WHERE CadetID={cadetID}")
+            cursor.execute(f"UPDATE Cadets SET Rank='{cadeNewRank}' WHERE CadetID={cadetID}")
+            connection.commit()
+
+            cursor = connection.cursor()
+            newRank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID={cadetID}").fetchall()
+            newRank = str(newRank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "13"
+            Before= f"{oldRank} {firstName} {lastName}"
+            After= f"{newRank} {firstName} {lastName}"
+            User_Input= cadeNewRank
+            Remarks= "N/A"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
             connection.commit()
 
         #Calls the function
@@ -1036,8 +1120,29 @@ def listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry,c
         newQuantity = newQuantityEntry.get()
         storeID= str(row).split(',')
         storeID = storeID[0].strip()
+
+        cursor = connection.cursor()
+        oldQtyName = cursor.execute(f"SELECT Name,Qty FROM Stores WHERE StoreID={storeID}").fetchall()
+        oldQtyName = str(oldQtyName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace("[", "").replace("]", "")
+
+
         cursor = connection.cursor()
         cursor.execute(f"UPDATE Stores SET Qty='{newQuantity}' WHERE StoreID={storeID}")
+        connection.commit()
+
+        cursor = connection.cursor()
+        newQtyName = cursor.execute(f"SELECT Name,Qty FROM Stores WHERE StoreID={storeID}").fetchall()
+        newQtyName = str(newQtyName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace("[", "").replace("]", "")
+
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        ActionID= "18"
+        Before= oldQtyName
+        After= newQtyName
+        User_Input= newQuantity
+        Remarks= "N/A"
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
         connection.commit()
 
     #Call the function
@@ -1163,6 +1268,23 @@ def addToOrder():
             cursor.execute(f"UPDATE Stores SET Qty='{newItemQuantity}' WHERE StoreID={itemID}")
             connection.commit()
 
+            cursor = connection.cursor()
+            itemName = cursor.execute(f"SELECT Name FROM Stores WHERE StoreID={itemID}").fetchall()
+            itemName = str(itemName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            itemSize = cursor.execute(f"SELECT Size FROM Stores WHERE StoreID={itemID}").fetchall()
+            itemSize = str(itemSize).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "21"
+            Before= "N/A"
+            After= f"{itemName} {itemSize}"
+            User_Input= "N/A"
+            Remarks= "N/A"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
+
             #Retrieves data from database to be inserted into listbox
             cursor = connection.cursor()
             data = cursor.execute(SQLCommand).fetchall()
@@ -1237,6 +1359,23 @@ def removeFromOrder():
         #Updates database using SQL
         cursor = connection.cursor()
         cursor.execute(f"UPDATE Stores SET Qty='{newItemQuantity}' WHERE StoreID={itemID}")
+        connection.commit()
+
+        cursor = connection.cursor()
+        itemName = cursor.execute(f"SELECT Name FROM Stores WHERE StoreID={itemID}").fetchall()
+        itemName = str(itemName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+        itemSize = cursor.execute(f"SELECT Size FROM Stores WHERE StoreID={itemID}").fetchall()
+        itemSize = str(itemSize).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        ActionID= "22"
+        Before= f"{itemName} {itemSize}"
+        After= "N/A"
+        User_Input= "N/A"
+        Remarks= "N/A"
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
         connection.commit()
 
         #Retrieves data from database to be inserted into listbox
@@ -1332,6 +1471,28 @@ def shortTermCheckboxEvent():
         cursor = connection.cursor()
         cursor.execute(f"INSERT INTO Logs (CadetID,StoreID,Qty_Taken,Date_Taken,Log_TypeID) VALUES ('{CadetID}', '{StoreID}', '{Qty_Taken}', '{Data_Taken}', '{Log_TypeID}')")
         connection.commit()
+
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "23"
+    Before= "N/A"
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "N/A"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
+
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "20"
+    Before= "N/A"
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "N/A"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
             
     #Clears all widgits in middle frame and right frame
     for widgets in middleFrame.winfo_children():
@@ -1389,6 +1550,28 @@ def longTermCheckboxEvent():
         cursor = connection.cursor()
         cursor.execute(f"INSERT INTO Logs (CadetID,StoreID,Qty_Taken,Date_Taken,Log_TypeID) VALUES ('{CadetID}', '{StoreID}', '{Qty_Taken}', '{Data_Taken}', '{Log_TypeID}')")
         connection.commit()
+
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "24"
+    Before= "N/A"
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "N/A"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
+
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "20"
+    Before= "N/A"
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "N/A"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
             
     #Clears all widgits in middle frame and right frame
     for widgets in middleFrame.winfo_children():
@@ -1503,7 +1686,7 @@ def confirmedOrder():
         #Checks if short term checkbox was not selected
         elif resultShort == 0:
             #Defines a list
-            button_list = [AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,closeWindow]
+            button_list = [AACMemberOptionsButton,listOfStoresButton,orderingOptionsButton,storesReturnsButton,selectPersonOrderingButton,adminButton,closeWindow]
             #Enables all buttons in the list
             for button in button_list:
                 button.configure(state= NORMAL)
@@ -1633,11 +1816,30 @@ def selectedPersonOrdering(namesListListbox):
         #Gets value in the selection
         rankName= namesListListbox.get(rankNameSelection[0])
         #Cleans the string up removing any unwanted character
-        rankNameClean= str(rankName).replace("(", "").replace("'", "").replace(",", "").replace(" ", "_").replace(")", "")
+        rankNameClean= str(rankName).replace("(", "").replace("'", "").replace(" ", "_").replace(")", "")
 
         #Makes global variable
         global CadetID
         CadetID= rankNameClean.split('_')[0]
+
+        cursor = connection.cursor()
+        Rank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID={CadetID}").fetchall()
+        Rank = str(Rank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+        First_Name = cursor.execute(f"SELECT First_Name FROM Cadets WHERE CadetID={CadetID}").fetchall()
+        First_Name = str(First_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+        Last_Name = cursor.execute(f"SELECT Last_Name FROM Cadets WHERE CadetID={CadetID}").fetchall()
+        Last_Name = str(Last_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        ActionID= "19"
+        Before= "N/A"
+        After= "N/A"
+        User_Input= f"{Rank} {First_Name} {Last_Name}"
+        Remarks= "N/A"
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+        connection.commit()
 
         #Calls the function
         storesList()
@@ -2088,6 +2290,26 @@ def longTermLogReturn(longTermLogListbox,quantityReturnEntryLong):
             cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnLong} WHERE StoreID= {StoreID}")
             cursor.execute(f"DELETE FROM Logs WHERE LogID= {LogID}").fetchall()
             connection.commit()
+
+            cursor = connection.cursor()
+            Rank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            Rank = str(Rank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            First_Name = cursor.execute(f"SELECT First_Name FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            First_Name = str(First_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            Last_Name = cursor.execute(f"SELECT Last_Name FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            Last_Name = str(Last_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "26"
+            Before= oldValueLong
+            After= newQuantity
+            User_Input= quantityReturnLong
+            Remarks= f"{Rank} {First_Name} {Last_Name}"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
+
             viewLogs()
 
         #Checks if new quantity is bigger than 0
@@ -2098,6 +2320,26 @@ def longTermLogReturn(longTermLogListbox,quantityReturnEntryLong):
             cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnLong} WHERE StoreID= {StoreID}")
             cursor.execute(f"UPDATE Logs SET Qty_Taken= Qty_Taken - {quantityReturnLong} WHERE LogID= {LogID}").fetchall()
             connection.commit()
+
+            cursor = connection.cursor()
+            Rank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            Rank = str(Rank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            First_Name = cursor.execute(f"SELECT First_Name FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            First_Name = str(First_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            Last_Name = cursor.execute(f"SELECT Last_Name FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            Last_Name = str(Last_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "26"
+            Before= oldValueLong
+            After= newQuantity
+            User_Input= quantityReturnLong
+            Remarks= f"{Rank} {First_Name} {Last_Name}"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
+
             viewLogs()
 
         #Checks if new quantity is smaller than 0
@@ -2128,6 +2370,33 @@ def longTermLogReturn(longTermLogListbox,quantityReturnEntryLong):
                 command= errorWindow.destroy
                 )
             errorButton.pack(pady= standardYPadding)
+
+    else:
+        #Creates a ctk window
+        errorWindow= ctk.CTkToplevel(root)
+        errorWindow.title("Error Window")
+        errorWindow.geometry("1200x500")
+        errorWindow.transient(root)
+        errorWindow.lift()
+
+        #Creates a ctk label
+        errorLabel= ctk.CTkLabel(
+            errorWindow,
+            text= "You have not selected an item",
+            font= standardFont
+            )
+        errorLabel.pack(pady= standardYPadding)
+
+        #Creates a ctk button
+        errorButton= ctk.CTkButton(
+            errorWindow,
+            text= "Close Window",
+            font= standardFont,
+            width= standardWidth,
+            height= standardHeight,
+            command= errorWindow.destroy
+            )
+        errorButton.pack(pady= standardYPadding)
 
 
 def shortTermLogReturn(shortTermLogListbox,quantityReturnEntryShort):
@@ -2154,6 +2423,26 @@ def shortTermLogReturn(shortTermLogListbox,quantityReturnEntryShort):
             cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnShort} WHERE StoreID= {StoreID}")
             cursor.execute(f"DELETE FROM Logs WHERE LogID= {LogID}").fetchall()
             connection.commit()
+
+            cursor = connection.cursor()
+            Rank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            Rank = str(Rank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            First_Name = cursor.execute(f"SELECT First_Name FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            First_Name = str(First_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            Last_Name = cursor.execute(f"SELECT Last_Name FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            Last_Name = str(Last_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "25"
+            Before= oldValueShort
+            After= newQuantity
+            User_Input= quantityReturnShort
+            Remarks= f"{Rank} {First_Name} {Last_Name}"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
+
             viewLogs()
             
         #Checks if new quantity is bigger than 0
@@ -2164,6 +2453,26 @@ def shortTermLogReturn(shortTermLogListbox,quantityReturnEntryShort):
             cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnShort} WHERE StoreID= {StoreID}")
             cursor.execute(f"UPDATE Logs SET Qty_Taken= Qty_Taken - {quantityReturnShort} WHERE LogID= {LogID}").fetchall()
             connection.commit()
+
+            cursor = connection.cursor()
+            Rank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            Rank = str(Rank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            First_Name = cursor.execute(f"SELECT First_Name FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            First_Name = str(First_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+            Last_Name = cursor.execute(f"SELECT Last_Name FROM Cadets WHERE CadetID = {CadetID}").fetchall()
+            Last_Name = str(Last_Name).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "25"
+            Before= oldValueShort
+            After= newQuantity
+            User_Input= quantityReturnShort
+            Remarks= f"{Rank} {First_Name} {Last_Name}"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
+
             viewLogs()
 
         #Checks if new quantity is smaller than 0
@@ -2195,8 +2504,35 @@ def shortTermLogReturn(shortTermLogListbox,quantityReturnEntryShort):
                 )
             errorButton.pack(pady= standardYPadding)
 
+    else:
+        #Creates a ctk window
+        errorWindow= ctk.CTkToplevel(root)
+        errorWindow.title("Error Window")
+        errorWindow.geometry("1200x500")
+        errorWindow.transient(root)
+        errorWindow.lift()
 
-##################################################################################################################
+        #Creates a ctk label
+        errorLabel= ctk.CTkLabel(
+            errorWindow,
+            text= "You have not selected an item",
+            font= standardFont
+            )
+        errorLabel.pack(pady= standardYPadding)
+
+        #Creates a ctk button
+        errorButton= ctk.CTkButton(
+            errorWindow,
+            text= "Close Window",
+            font= standardFont,
+            width= standardWidth,
+            height= standardHeight,
+            command= errorWindow.destroy
+            )
+        errorButton.pack(pady= standardYPadding)
+
+
+################################### ADMIN OPTIONS ###################################################
 
 
 def adminOptions():
@@ -2320,7 +2656,7 @@ def forgotPassword(passwordWindow):
         font= standardFont,
         width= 400,
         height= standardHeight,
-        command= returnToLogin,
+        command=lambda: returnToLogin(passwordWindow),
         )
     questionCheckerButton.pack(pady = standardYPadding)
 
@@ -2408,7 +2744,7 @@ def logIn(passwordWindow,passwordEntry):
             font= standardFont,
             width= standardWidth,
             height= standardHeight,
-            command= returnToLogin
+            command= lambda: returnToLogin(passwordWindow)
             )
         passwordErrorButton.pack(pady= standardYPadding)
 
@@ -2485,7 +2821,7 @@ def succesfulLogIn():
         )
     userAcountButton.pack(pady = standardYPadding)
 
-#-----------------------------------------------------------------------------------------------------------------
+#--------------------------------- REMOVE MEMBER OPTIONS -------------------------------------------------------------
 
 def removeAACMemberOptions():
 
@@ -2631,7 +2967,7 @@ def removeMemberYes(cadetID,areYouSureWindow):
     #Closes window  
     areYouSureWindow.destroy()
 
-#-----------------------------------------------------------------------------------------------------------------
+#--------------------------------- CHANGE ID OPTIONS -----------------------------------------------------------
 
 def changeIDOptions():
 
@@ -3162,7 +3498,6 @@ def adminAccountOptions():
     )
     changePassword.pack(pady = standardYPadding)
 
-#-----------------------------------------------------------------------------------------------------------------
 
 def changeSecretQuestionOptions():
 
@@ -3338,7 +3673,6 @@ def adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsLi
             )
         errorButton.pack(pady= standardYPadding)
 
-#-----------------------------------------------------------------------------------------------------------------
 
 def changePasswordOptions():
                                       
@@ -3496,7 +3830,7 @@ def userAccountOptions():
         font= (standardFont),
         width= standardWidth,
         height= standardHeight,
-        command=deleteUserAccount,
+        command=deleteUserAccountOption,
         )
     removeUserAccountButton.pack(pady = standardYPadding)
 
@@ -3516,11 +3850,10 @@ def userAccountOptions():
         font= (standardFont),
         width= standardWidth,
         height= standardHeight,
-        command=changePassword,
+        command=changeUserPassword,
         )
     changePasswordButton.pack(pady = standardYPadding)
 
-#-----------------------------------------------------------------------------------------------------------------
 
 def addUserAccount():
 
@@ -3709,7 +4042,7 @@ def addAccount(namesListListbox,passwordEntry,confirmedPasswordEntry,secretQuest
 
 #----------------------------------------------------------------------------------------------------------------
 
-def deleteUserAccount():
+def deleteUserAccountOption():
 
     for widgets in rightFrame.winfo_children():
         widgets.destroy()
@@ -3750,12 +4083,12 @@ def deleteUserAccount():
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: selectionChecker(accountsListListbox),
+        command=lambda: userSelectionChecker(accountsListListbox),
         )
     removeAccountButton.pack(pady = standardYPadding)
 
 
-def selectionChecker(accountsListListbox):
+def userSelectionChecker(accountsListListbox):
     #Gets user selection
     accountSelection= accountsListListbox.curselection()
     #Checks if there is not a selection
@@ -3851,7 +4184,7 @@ def deleteUserAccountYes(accountID,areYouSureWindow):
     cursor.execute(f'DELETE FROM Accounts WHERE AccountID={accountID}')
     connection.commit()
     
-    deleteUserAccount()
+    deleteUserAccountOption()
 
     #Closes window  
     areYouSureWindow.destroy()
@@ -3865,7 +4198,7 @@ def changeSecretQuestion():
         widgets.destroy()
 
     #Creates a label
-    label= ctk.CTkLabel(rightFrame, text="Select the account you wish to modify \n FORMAT = Account ID, Username,  Secret Question, Secret Question Answer", font= standardFont)
+    label= ctk.CTkLabel(rightFrame, text="Select the account you wish to modify \n FORMAT = Account ID, Username, Secret Question, Secret Question Answer", font= standardFont)
     label.pack(pady = standardYPadding)
 
     #Creates a frame
@@ -3873,7 +4206,7 @@ def changeSecretQuestion():
     listboxFrame.pack(pady = standardYPadding)
 
     #Create list box and writes the contents of the database into it
-    adminAccountsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 45, height=10, font=("",15))
+    userAccountsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 45, height=10, font=("",15))
     cursor = connection.cursor()
     data = cursor.execute(f"SELECT AccountID,Username,Secret_Question,Secret_Question_Answer FROM Accounts WHERE Account_TypeID = 2").fetchall()
     formatted_data = []
@@ -3884,13 +4217,13 @@ def changeSecretQuestion():
         secret_Question_Answer = item[3]
         formatted_data.append(f"{AccountID}, {Username}, {secret_Question}, {secret_Question_Answer}")
     for row in formatted_data:
-        adminAccountsListbox.insert(END, row)
-    adminAccountsListbox.pack(side=LEFT)
+        userAccountsListbox.insert(END, row)
+    userAccountsListbox.pack(side=LEFT)
 
     #Creates a scroll bar
-    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=adminAccountsListbox.yview)
+    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=userAccountsListbox.yview)
     listboxScrollbar.pack(side="right", fill=Y)
-    adminAccountsListbox.config(yscrollcommand=listboxScrollbar.set)
+    userAccountsListbox.config(yscrollcommand=listboxScrollbar.set)
 
     #Creates an entry box
     questionEntry = ctk.CTkEntry(
@@ -3919,18 +4252,18 @@ def changeSecretQuestion():
         font= standardFont,
         width= 500,
         height= standardHeight,
-        command=lambda: updateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox),
+        command=lambda: updateQuestion(questionEntry,questionAnswerEntry,userAccountsListbox),
         )
     changeQuantityButton.pack(pady = standardYPadding)
 
 
-def updateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox):
+def updateQuestion(questionEntry,questionAnswerEntry,userAccountsListbox):
     replacementQuestion= questionEntry.get()
     replacementAnswer= questionAnswerEntry.get()
-    adminAccountSelection= adminAccountsListbox.curselection()
-    if adminAccountSelection:
+    userAccountSelection= userAccountsListbox.curselection()
+    if userAccountSelection:
 
-        AccountID= adminAccountsListbox.get(adminAccountSelection[0])
+        AccountID= userAccountsListbox.get(userAccountSelection[0])
         AccountID= str(AccountID).split(',')[0]
 
         if replacementQuestion == '':
@@ -4034,103 +4367,98 @@ def updateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox):
 
 #-----------------------------------------------------------------------------------------------------------------
 
-def changePassword():
-                                
+def changeUserPassword():
+
+    #Clear all widgits in right frame
     for widgets in rightFrame.winfo_children():
         widgets.destroy()
 
     #Creates a label
-    label= ctk.CTkLabel(rightFrame, text="Follow the prompts to change the password", font= standardFont)
+    label= ctk.CTkLabel(rightFrame, text="Select the account you wish to modify \n FORMAT = Account ID, Username", font= standardFont)
     label.pack(pady = standardYPadding)
 
+    #Creates a frame
+    listboxFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
+    listboxFrame.pack(pady = standardYPadding)
+
+    #Create list box and writes the contents of the database into it
+    userAccountsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 45, height=10, font=("",15))
     cursor = connection.cursor()
-    data = cursor.execute(f"SELECT AccountID, Password FROM Accounts WHERE Account_TypeID = 2").fetchall()
+    data = cursor.execute(f"SELECT AccountID,Username FROM Accounts WHERE Account_TypeID = 2").fetchall()
     formatted_data = []
     for item in data:
         AccountID = item[0]
-        adminAccountPassword = item[1]
-        formatted_data.append(f"{AccountID}, {adminAccountPassword}")
+        Username = item[1]
+        formatted_data.append(f"{AccountID}, {Username}")
+    for row in formatted_data:
+        userAccountsListbox.insert(END, row)
+    userAccountsListbox.pack(side=LEFT)
+
+    #Creates a scroll bar
+    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=userAccountsListbox.yview)
+    listboxScrollbar.pack(side="right", fill=Y)
+    userAccountsListbox.config(yscrollcommand=listboxScrollbar.set)
 
     #Creates an entry box
-    adminAccountOldPassword = ctk.CTkEntry(
+    userOldPasswordEntry = ctk.CTkEntry(
         rightFrame, 
         placeholder_text="Enter Old Password",
         font= standardFont,
         width= 500,
         height= standardHeight,
-        show= '*'
+        show= '*',
         )
-    adminAccountOldPassword.pack(pady = standardYPadding)
+    userOldPasswordEntry.pack(pady = standardYPadding)
 
     #Creates an entry box
-    adminAccountNewPassword = ctk.CTkEntry(
+    userNewPasswordEntry = ctk.CTkEntry(
         rightFrame, 
         placeholder_text="Enter New Password",
         font= standardFont,
         width= 500,
         height= standardHeight,
-        show= '*'
+        show= '*',
         )
-    adminAccountNewPassword.pack(pady = standardYPadding)
+    userNewPasswordEntry.pack(pady = standardYPadding)
 
     #Creates an entry box
-    adminAccountNewPasswordConfirm = ctk.CTkEntry(
+    userConfirmNewPasswordEntry = ctk.CTkEntry(
         rightFrame, 
         placeholder_text="Enter New Password Again",
         font= standardFont,
         width= 500,
         height= standardHeight,
-        show= '*'
+        show= '*',
         )
-    adminAccountNewPasswordConfirm.pack(pady = standardYPadding)
+    userConfirmNewPasswordEntry.pack(pady = standardYPadding)
 
     #Creates a button
-    changeQuantityButton = ctk.CTkButton(
+    userUpdatePasswordButton = ctk.CTkButton(
         rightFrame,
         text= "Update Password",
         font= standardFont,
         width= 500,
         height= standardHeight,
-        command=lambda: passwordChecker(adminAccountOldPassword,adminAccountNewPassword,adminAccountNewPasswordConfirm,adminAccountPassword,AccountID),
+        command=lambda: userPasswordChecker(userOldPasswordEntry,userNewPasswordEntry,userConfirmNewPasswordEntry,userAccountsListbox),
         )
-    changeQuantityButton.pack(pady = standardYPadding)
+    userUpdatePasswordButton.pack(pady = standardYPadding)
 
 
-def passwordChecker(adminAccountOldPassword,adminAccountNewPassword,adminAccountNewPasswordConfirm,adminAccountPassword,AccountID):
-    adminOldPassword= adminAccountOldPassword.get()
-    adminNewPassword= adminAccountNewPassword.get()
-    adminNewPasswordConfirm= adminAccountNewPasswordConfirm.get()
+def userPasswordChecker(userOldPasswordEntry,userNewPasswordEntry,userConfirmNewPasswordEntry,userAccountsListbox):
+    userOldPassword= userOldPasswordEntry.get()
+    userNewPassword= userNewPasswordEntry.get()
+    userNewPasswordConfirm= userConfirmNewPasswordEntry.get()
+    userAccountSelection= userAccountsListbox.curselection()
 
-    if adminOldPassword != adminAccountPassword:
-        #Creates error window
-        errorWindow= ctk.CTkToplevel(root)
-        errorWindow.title("Error Window")
-        errorWindow.geometry("1200x500")
-        errorWindow.transient(root)
-        errorWindow.lift()
+    if userAccountSelection:
 
-        #Creates a label
-        errorLabel= ctk.CTkLabel(
-            errorWindow,
-            text= "The old account password does not much currant password",
-            font= standardFont
-            )
-        errorLabel.pack(pady= standardYPadding)
+        AccountID= userAccountsListbox.get(userAccountSelection[0])
+        AccountID= str(AccountID).split(',')[0]
+        cursor = connection.cursor()
+        userAccountPassword = cursor.execute(f"SELECT Password FROM Accounts WHERE AccountID = {AccountID}").fetchall()
+        userAccountPassword = str(userAccountPassword).replace("[","").replace("(","").replace("'","").replace(",","").replace(")","").replace("]","")
 
-        #Creates a button
-        errorButton= ctk.CTkButton(
-            errorWindow,
-            text= "Close Window",
-            font= standardFont,
-            width= standardWidth,
-            height= standardHeight,
-            command= errorWindow.destroy
-            )
-        errorButton.pack(pady= standardYPadding)
-        changePassword
-
-    else:
-        if adminNewPassword != adminNewPasswordConfirm:
+        if userOldPassword != userAccountPassword:
             #Creates error window
             errorWindow= ctk.CTkToplevel(root)
             errorWindow.title("Error Window")
@@ -4141,7 +4469,7 @@ def passwordChecker(adminAccountOldPassword,adminAccountNewPassword,adminAccount
             #Creates a label
             errorLabel= ctk.CTkLabel(
                 errorWindow,
-                text= "The new passwords do not match",
+                text= "The old account password does not match the currant password",
                 font= standardFont
                 )
             errorLabel.pack(pady= standardYPadding)
@@ -4156,13 +4484,69 @@ def passwordChecker(adminAccountOldPassword,adminAccountNewPassword,adminAccount
                 command= errorWindow.destroy
                 )
             errorButton.pack(pady= standardYPadding)
-            changePassword
+            changeUserPassword
 
         else:
-            cursor = connection.cursor()
-            cursor.execute(f"UPDATE Accounts SET Password='{adminNewPasswordConfirm}' WHERE AccountID={AccountID}")
-            connection.commit()
-            changePassword()
+            if userNewPassword != userNewPasswordConfirm:
+                #Creates error window
+                errorWindow= ctk.CTkToplevel(root)
+                errorWindow.title("Error Window")
+                errorWindow.geometry("1200x500")
+                errorWindow.transient(root)
+                errorWindow.lift()
+
+                #Creates a label
+                errorLabel= ctk.CTkLabel(
+                    errorWindow,
+                    text= "The new passwords do not match",
+                    font= standardFont
+                    )
+                errorLabel.pack(pady= standardYPadding)
+
+                #Creates a button
+                errorButton= ctk.CTkButton(
+                    errorWindow,
+                    text= "Close Window",
+                    font= standardFont,
+                    width= standardWidth,
+                    height= standardHeight,
+                    command= errorWindow.destroy
+                    )
+                errorButton.pack(pady= standardYPadding)
+                changeUserPassword
+
+            else:
+                cursor = connection.cursor()
+                cursor.execute(f"UPDATE Accounts SET Password='{userNewPassword}' WHERE AccountID={AccountID}")
+                connection.commit()
+                changeUserPassword()
+    
+    else:
+        #Creates error window
+        errorWindow= ctk.CTkToplevel(root)
+        errorWindow.title("Error Window")
+        errorWindow.geometry("1200x500")
+        errorWindow.transient(root)
+        errorWindow.lift()
+
+        #Creates a label
+        errorLabel= ctk.CTkLabel(
+            errorWindow,
+            text= "You have not selected an account",
+            font= standardFont
+            )
+        errorLabel.pack(pady= standardYPadding)
+
+        #Creates a button
+        errorButton= ctk.CTkButton(
+            errorWindow,
+            text= "Close Window",
+            font= standardFont,
+            width= standardWidth,
+            height= standardHeight,
+            command= errorWindow.destroy
+            )
+        errorButton.pack(pady= standardYPadding)
 
 
 ##################################################################################################################
