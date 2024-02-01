@@ -19,7 +19,7 @@ ctk.set_default_color_theme("dark-blue")
 
 # Setting program main window
 root = ctk.CTk()
-root.title("505ACU Albany Q-Store Software Version: 0.8")
+root.title("505ACU Albany Q-Store Software Version: 0.9")
 screenWidth = root.winfo_screenwidth()
 screenHeight = root.winfo_screenheight()
 root.geometry(f"{screenWidth}x{screenHeight}")
@@ -1122,7 +1122,7 @@ def listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry,c
         storeID = storeID[0].strip()
 
         cursor = connection.cursor()
-        oldQtyName = cursor.execute(f"SELECT Name,Qty FROM Stores WHERE StoreID={storeID}").fetchall()
+        oldQtyName = cursor.execute(f"SELECT Name,Size,Qty FROM Stores WHERE StoreID={storeID}").fetchall()
         oldQtyName = str(oldQtyName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace("[", "").replace("]", "")
 
 
@@ -1131,7 +1131,7 @@ def listStoresUpdateQuantity(storesListListbox,formatted_data,newQuantityEntry,c
         connection.commit()
 
         cursor = connection.cursor()
-        newQtyName = cursor.execute(f"SELECT Name,Qty FROM Stores WHERE StoreID={storeID}").fetchall()
+        newQtyName = cursor.execute(f"SELECT Name,Size,Qty FROM Stores WHERE StoreID={storeID}").fetchall()
         newQtyName = str(newQtyName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace("[", "").replace("]", "")
 
         Date= datetime.datetime.now().strftime("%d/%m/%Y")
@@ -2660,6 +2660,18 @@ def forgotPassword(passwordWindow):
         )
     questionCheckerButton.pack(pady = standardYPadding)
 
+    
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "4"
+    Before= "N/A"
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "Admin"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
+
 
 def returnToLogin(passwordWindow):
     passwordWindow.destroy()
@@ -2689,9 +2701,20 @@ def adminLogInQuestionChecker(passwordWindow,adminAccountQuestionAnswer,adminAcc
             font= standardFont,
             width= standardWidth,
             height= standardHeight,
-            command= forgotPassword
+            command= lambda: forgotPassword(passwordWindow)
             )
         errorButton.pack(pady= standardYPadding)
+
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        ActionID= "9"
+        Before= "N/A"
+        After= "N/A"
+        User_Input= adminQuestionAnswer
+        Remarks= "Admin"
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+        connection.commit()
 
     else:
         for widgets in passwordWindow.winfo_children():
@@ -2748,8 +2771,34 @@ def logIn(passwordWindow,passwordEntry):
             )
         passwordErrorButton.pack(pady= standardYPadding)
 
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        ActionID= "3"
+        Before= "N/A"
+        After= "N/A"
+        User_Input= userEntry
+        Remarks= "Admin"
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+        connection.commit()
+
+
     elif userEntry in passwords:
         passwordWindow.destroy()
+
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        ActionID= "1"
+        Before= "N/A"
+        After= "N/A"
+        User_Input= userEntry
+        Remarks= "Admin"
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+        connection.commit()
+
+
+
         succesfulLogIn()
 
 
@@ -2957,15 +3006,37 @@ def AACMember(namesListListbox):
 
 
 def removeMemberYes(cadetID,areYouSureWindow):
+
+    cursor = connection.cursor()
+    rank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID={cadetID}").fetchall()
+    rank = str(rank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+    firstName = cursor.execute(f"SELECT First_Name FROM Cadets WHERE CadetID={cadetID}").fetchall()
+    firstName = str(firstName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+    lastName = cursor.execute(f"SELECT Last_Name FROM Cadets WHERE CadetID={cadetID}").fetchall()
+    lastName = str(lastName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
     #Deletes data from the database
     cursor = connection.cursor()
     cursor.execute(f'DELETE FROM Cadets WHERE CadetID={cadetID}')
     connection.commit()
     
-    removeAACMemberOptions()
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "14"
+    Before= f"{rank} {firstName} {lastName}"
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "Admin"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
+
 
     #Closes window  
     areYouSureWindow.destroy()
+
+    removeAACMemberOptions()
+
 
 #--------------------------------- CHANGE ID OPTIONS -----------------------------------------------------------
 
@@ -3071,6 +3142,26 @@ def updateID(namesListListbox,newIDEntry,formatted_data):
         rowRankString= str(rowRank)
         cadetID = rowRankString.split()[0]
         cadeNewID = newIDEntry.get()
+
+        cursor = connection.cursor()
+        rank = cursor.execute(f"SELECT Rank FROM Cadets WHERE CadetID={cadetID}").fetchall()
+        rank = str(rank).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+        firstName = cursor.execute(f"SELECT First_Name FROM Cadets WHERE CadetID={cadetID}").fetchall()
+        firstName = str(firstName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+        lastName = cursor.execute(f"SELECT Last_Name FROM Cadets WHERE CadetID={cadetID}").fetchall()
+        lastName = str(lastName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace(" ", "").replace("[", "").replace("]", "")
+
+
+        Date= datetime.datetime.now().strftime("%d/%m/%Y")
+        Time= datetime.datetime.now().strftime("%H:%M:%S")
+        ActionID= "15"
+        Before= f"{cadetID} {rank} {firstName} {lastName}"
+        After= f"{cadeNewID} {rank} {firstName} {lastName}"
+        User_Input= cadeNewID
+        Remarks= "Admin"
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+        connection.commit()
 
         #Updates rank in database using SQL
         cursor = connection.cursor()
@@ -3280,6 +3371,22 @@ def removeItem(storesListbox,itemSelection):
 
 
 def removeStoreYes(StoreID,areYouSureWindow):
+
+    cursor = connection.cursor()
+    oldQtyName = cursor.execute(f"SELECT Name,Size,Qty FROM Stores WHERE StoreID={StoreID}").fetchall()
+    oldQtyName = str(oldQtyName).replace("(", "").replace(")", "").replace(",", "").replace("'", "").replace("[", "").replace("]", "")
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "16"
+    Before= oldQtyName
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "Admin"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
+
+
     #Deletes data from the database
     cursor = connection.cursor()
     cursor.execute(f'DELETE FROM Stores WHERE StoreID={StoreID}')
@@ -3461,9 +3568,33 @@ def addItem(itemNameEntry,itemSizeEntry,itemQuantityEntry,categoryID):
             cursor = connection.cursor()
             cursor.execute(f"INSERT INTO Stores (Name, CategoryID, Size, Qty) VALUES ('{itemName}','{categoryID}','{itemSize}','{itemQuantity}')")
             connection.commit()
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "17"
+            Before= "N/A"
+            After= f"{itemName} {itemSize} {itemQuantity}"
+            User_Input= "N/A"
+            Remarks= "Admin"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
+
+
         else:
             cursor = connection.cursor()
             cursor.execute(f"INSERT INTO Stores (Name, CategoryID, Qty) VALUES ('{itemName}','{categoryID}','{itemQuantity}')")
+            connection.commit()
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "17"
+            Before= "N/A"
+            After= f"{itemName} {itemQuantity}"
+            User_Input= "N/A"
+            Remarks= "Admin"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
             connection.commit()
 
     #Call the function
@@ -3559,12 +3690,12 @@ def changeSecretQuestionOptions():
         font= standardFont,
         width= 500,
         height= standardHeight,
-        command=lambda: adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox),
+        command=lambda: adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox,secret_Question_Answer,secret_Question),
         )
     changeQuantityButton.pack(pady = standardYPadding)
 
 
-def adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox):
+def adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsListbox,secret_Question_Answer,secret_Question):
                             
     replacementQuestion= questionEntry.get()
     replacementAnswer= questionAnswerEntry.get()
@@ -3610,6 +3741,17 @@ def adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsLi
                 connection.commit()
                 changeSecretQuestionOptions()
 
+                Date= datetime.datetime.now().strftime("%d/%m/%Y")
+                Time= datetime.datetime.now().strftime("%H:%M:%S")
+                ActionID= "11"
+                Before= secret_Question_Answer
+                After= replacementAnswer
+                User_Input= "N/A"
+                Remarks= "Admin"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+                connection.commit()
+
         else:
 
             if replacementAnswer == '':
@@ -3644,6 +3786,27 @@ def adminAccountUpdateQuestion(questionEntry,questionAnswerEntry,adminAccountsLi
                 cursor.execute(f"UPDATE Accounts SET Secret_Question='{replacementQuestion}' WHERE AccountID={AccountID}")
                 cursor.execute(f"UPDATE Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE AccountID={AccountID}")
                 connection.commit()
+
+                Date= datetime.datetime.now().strftime("%d/%m/%Y")
+                Time= datetime.datetime.now().strftime("%H:%M:%S")
+                ActionID= "10"
+                Before= secret_Question
+                After= replacementQuestion
+                User_Input= "N/A"
+                Remarks= "Admin"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+                connection.commit()
+
+                ActionID= "11"
+                Before= secret_Question_Answer
+                After= replacementAnswer
+                User_Input= "N/A"
+                Remarks= "Admin"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+                connection.commit()
+
                 changeSecretQuestionOptions()
 
     else:
@@ -3803,6 +3966,18 @@ def adminAccountPasswordChecker(adminAccountOldPassword,adminAccountNewPassword,
             cursor = connection.cursor()
             cursor.execute(f"UPDATE Accounts SET Password='{adminNewPasswordConfirm}' WHERE AccountID={AccountID}")
             connection.commit()
+
+            Date= datetime.datetime.now().strftime("%d/%m/%Y")
+            Time= datetime.datetime.now().strftime("%H:%M:%S")
+            ActionID= "5"
+            Before= adminOldPassword
+            After= adminNewPasswordConfirm
+            User_Input= "N/A"
+            Remarks= "Admin"
+            cursor = connection.cursor()
+            cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+            connection.commit()
+
             changePasswordOptions()
 
 #-----------------------------------------------------------------------------------------------------------------
@@ -4011,6 +4186,19 @@ def addAccount(namesListListbox,passwordEntry,confirmedPasswordEntry,secretQuest
                 cursor = connection.cursor()
                 cursor.execute(f"INSERT INTO Accounts (CadetID, Username, Password, Account_TypeID, Secret_Question, Secret_Question_Answer) VALUES ('{cadetID}','{username}','{password}','{accountType}','{secretQuestion}','{secretQuestionAnswer}')")
                 connection.commit()
+
+                Date= datetime.datetime.now().strftime("%d/%m/%Y")
+                Time= datetime.datetime.now().strftime("%H:%M:%S")
+                ActionID= "6"
+                Before= "N/A"
+                After= f"{username} {password} {secretQuestion} {secretQuestionAnswer}"
+                User_Input= "N/A"
+                Remarks= "Standard_Account"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+                connection.commit()
+
+
                 addUserAccount()
 
     else:
@@ -4161,7 +4349,7 @@ def deleteAccount(accountsListListbox):
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: deleteUserAccountYes(accountID,areYouSureWindow)
+        command=lambda: deleteUserAccountYes(accountID,areYouSureWindow,cleanStringAccount)
         )
     yesButton.pack(pady= standardYPadding, padx= 10, side='left')
 
@@ -4177,17 +4365,28 @@ def deleteAccount(accountsListListbox):
     noButton.pack(pady= standardYPadding, padx= 10, side='left')
 
 
-def deleteUserAccountYes(accountID,areYouSureWindow):
+def deleteUserAccountYes(accountID,areYouSureWindow,cleanStringAccount):
 
     #Deletes data from the database
     cursor = connection.cursor()
     cursor.execute(f'DELETE FROM Accounts WHERE AccountID={accountID}')
     connection.commit()
     
-    deleteUserAccountOption()
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "7"
+    Before= cleanStringAccount
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "Admin"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
 
     #Closes window  
     areYouSureWindow.destroy()
+
+    deleteUserAccountOption()
 
 #-----------------------------------------------------------------------------------------------------------------
 
@@ -4252,12 +4451,12 @@ def changeSecretQuestion():
         font= standardFont,
         width= 500,
         height= standardHeight,
-        command=lambda: updateQuestion(questionEntry,questionAnswerEntry,userAccountsListbox),
+        command=lambda: updateQuestion(questionEntry,questionAnswerEntry,userAccountsListbox,secret_Question_Answer,secret_Question),
         )
     changeQuantityButton.pack(pady = standardYPadding)
 
 
-def updateQuestion(questionEntry,questionAnswerEntry,userAccountsListbox):
+def updateQuestion(questionEntry,questionAnswerEntry,userAccountsListbox,secret_Question_Answer,secret_Question):
     replacementQuestion= questionEntry.get()
     replacementAnswer= questionAnswerEntry.get()
     userAccountSelection= userAccountsListbox.curselection()
@@ -4300,6 +4499,18 @@ def updateQuestion(questionEntry,questionAnswerEntry,userAccountsListbox):
                 cursor = connection.cursor()
                 cursor.execute(f"UPDATE Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE Admin_AccountID={AccountID}")
                 connection.commit()
+
+                Date= datetime.datetime.now().strftime("%d/%m/%Y")
+                Time= datetime.datetime.now().strftime("%H:%M:%S")
+                ActionID= "11"
+                Before= secret_Question_Answer
+                After= replacementAnswer
+                User_Input= "N/A"
+                Remarks= "Standard_Account"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+                connection.commit()
+
                 changeSecretQuestion()
 
         else:
@@ -4336,6 +4547,27 @@ def updateQuestion(questionEntry,questionAnswerEntry,userAccountsListbox):
                 cursor.execute(f"UPDATE Accounts SET Secret_Question='{replacementQuestion}' WHERE AccountID={AccountID}")
                 cursor.execute(f"UPDATE Accounts SET Secret_Question_Answer='{replacementAnswer}' WHERE AccountID={AccountID}")
                 connection.commit()
+
+                Date= datetime.datetime.now().strftime("%d/%m/%Y")
+                Time= datetime.datetime.now().strftime("%H:%M:%S")
+                ActionID= "10"
+                Before= secret_Question
+                After= replacementQuestion
+                User_Input= "N/A"
+                Remarks= "Standard_Account"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+                connection.commit()
+
+                ActionID= "11"
+                Before= secret_Question_Answer
+                After= replacementAnswer
+                User_Input= "N/A"
+                Remarks= "Standard_Account"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+                connection.commit()
+
                 changeSecretQuestion()
 
     else:
@@ -4519,6 +4751,18 @@ def userPasswordChecker(userOldPasswordEntry,userNewPasswordEntry,userConfirmNew
                 cursor = connection.cursor()
                 cursor.execute(f"UPDATE Accounts SET Password='{userNewPassword}' WHERE AccountID={AccountID}")
                 connection.commit()
+
+                Date= datetime.datetime.now().strftime("%d/%m/%Y")
+                Time= datetime.datetime.now().strftime("%H:%M:%S")
+                ActionID= "5"
+                Before= userOldPassword
+                After= userNewPassword
+                User_Input= "N/A"
+                Remarks= "Standard_Account"
+                cursor = connection.cursor()
+                cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+                connection.commit()
+
                 changeUserPassword()
     
     else:
