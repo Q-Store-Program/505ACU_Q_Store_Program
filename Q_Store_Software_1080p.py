@@ -5,6 +5,7 @@ import sqlite3
 from contextlib import closing
 import customtkinter as ctk
 import pyautogui
+from tkcalendar import DateEntry
 
 connection = sqlite3.connect("505_ACU_Q-Store_Database.db")
 
@@ -2881,15 +2882,15 @@ def succesfulLogIn():
     userAcountButton.pack(pady = standardYPadding)
 
     #Creats a ctk button
-    downloadLogsButton = ctk.CTkButton(
+    viewLogsButton = ctk.CTkButton(
         leftBottomFrame,
-        text= "Download Logs",
+        text= "View Logs",
         font= (standardFont),
         width= standardWidth,
         height= standardHeight,
-        command=downloadLogsOptions,
+        command=viewLogsOptions,
         )
-    downloadLogsButton.pack(pady = standardYPadding)
+    viewLogsButton.pack(pady = standardYPadding)
 
 #--------------------------------- REMOVE MEMBER OPTIONS -------------------------------------------------------------
 
@@ -4817,32 +4818,110 @@ def userPasswordChecker(userOldPasswordEntry,userNewPasswordEntry,userConfirmNew
 #-----------------------------------------------------------------------------------------------------------------
 
 
-def downloadLogsOptions():
+def viewLogsOptions():
 
     for widgets in middleFrame.winfo_children():
         widgets.destroy()
     for widgets in rightFrame.winfo_children():
         widgets.destroy()
 
+    Day= datetime.datetime.now().strftime("%d")
+    Month= datetime.datetime.now().strftime("%m")
+    Year= datetime.datetime.now().strftime("%Y")
+    Day= int(Day)
+    Month= int(Month)
+    Year= int(Year)
+
+    #Creates a label
+    label= ctk.CTkLabel(middleFrame, text="Select start date", font= standardFont)
+    label.pack(pady = standardYPadding)
+
+    calOne = DateEntry(middleFrame, 
+        width=30, 
+        year=Year, 
+        month=Month, 
+        day=Day, 
+        background='darkblue', 
+        foreground='white', 
+        borderwidth=5,
+        date_pattern='dd/mm/yyyy',
+        font=standardFont)
+    calOne.pack(padx=10, pady=10)
+
+    #Creates a label
+    label= ctk.CTkLabel(middleFrame, text="Select end date", font= standardFont)
+    label.pack(pady = standardYPadding)
+
+    calTwo = DateEntry(middleFrame, 
+        width=30, 
+        year=Year, 
+        month=Month, 
+        day=Day, 
+        background='darkblue', 
+        foreground='white', 
+        borderwidth=5,
+        date_pattern='dd/mm/yyyy',
+        font=standardFont)
+    calTwo.pack(padx=10, pady=10)
+
+    #Creates a button
+    getLogsButton = ctk.CTkButton(
+        middleFrame,
+        text= "Get Logs",
+        font= standardFont,
+        width= 500,
+        height= standardHeight,
+        command=lambda: getLogs(calOne,calTwo),
+        )
+    getLogsButton.pack(pady = standardYPadding)
+
+
+def getLogs(calOne,calTwo):
+
+    calOneDate = calOne.get_date()
+    calOneDate = datetime.strtime(calOneDate, "%m/%d/%y").strftime("%d/%m/%Y")
+    print("Selected date:", calOneDate)
+
+    calTwoDate = calTwo.get_date()
+    calTwoDate = datetime.strtime(calTwoDate, "%m/%d/%y").strftime("%d/%m/%Y")
+    print("Selected date:", calTwoDate)
+
     #Create frame
     listboxFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
     listboxFrame.pack(pady = standardYPadding)
 
     #Creates list box and fills it with members names using SQL
-    logsListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 30, height= 25, font= standardFont)
+    viewLogsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height=25, font= standardFont)
     cursor = connection.cursor()
-    data = cursor.execute("SELECT CadetID,rank,first_name,last_name FROM Cadets").fetchall()
+    data = cursor.execute(f"SELECT LogID,AccountID,Date,Time,Before,After,User_Input,Remarks FROM ActionsLogs").fetchall()
+    data = cursor.execute(f"""
+        SELECT ActionsLogs.LogID,Accounts.Username,ActionsLogs.Date,ActionsLogs.Time,Actions.Action,ActionsLogs.Before,ActionsLogs.After,ActionsLogs.User_Input,ActionsLogs.Remarks
+        FROM ActionsLogs
+        INNER JOIN Actions
+        ON ActionsLogs.ActionID = Actions.ActionID
+        INNER JOIN Accounts
+        ON ActionsLogs.AccountID = Accounts.AccountID
+        WHERE Date BETWEEN {calOneDate} AND {calTwoDate}""").fetchall()
     formatted_data = []
-    for row in data:
-        formatted_data.append(' '.join(map(str, row)))
+    for item in data:
+        LogID = item[0]
+        AccountID = item[1]
+        Date = item[2] if item[2] is not None else 'N/A'
+        Time = item[3]
+        Action = item[4]
+        Before = item[5]
+        After = item[6]
+        User_Input = item[7]
+        Remarks = item[8]
+        formatted_data.append(f"{LogID}, {AccountID}, {Date}, {Time}, {Action}, {Before}, {After}, {User_Input}, {Remarks}")
     for row in formatted_data:
-        logsListListbox.insert(END, row)
-    logsListListbox.pack(side=LEFT)
+        viewLogsListbox.insert(END, row)
+    viewLogsListbox.pack(side=LEFT)
 
     #Creates scroll bar
-    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=logsListListbox.yview)
+    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=viewLogsListbox.yview)
     listboxScrollbar.pack(side="right", fill=Y)
-    logsListListbox.config(yscrollcommand=listboxScrollbar.set)
+    viewLogsListbox.config(yscrollcommand=listboxScrollbar.set)
 
 
 ##################################################################################################################
