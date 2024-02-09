@@ -1,0 +1,35 @@
+    #Create frame
+    listboxFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
+    listboxFrame.pack(pady = standardYPadding)
+
+    #Creates list box and fills it with members names using SQL
+    viewLogsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 60, height=35, font= standardFont)
+    cursor = connection.cursor()
+    data = cursor.execute(f"""
+        SELECT ActionsLogs.LogID,Accounts.Username,ActionsLogs.Date,ActionsLogs.Time,Actions.Action,ActionsLogs.Before,ActionsLogs.After,ActionsLogs.User_Input,ActionsLogs.Remarks
+        FROM ActionsLogs
+        INNER JOIN Actions
+        ON ActionsLogs.ActionID = Actions.ActionID
+        INNER JOIN Accounts
+        ON Accounts.AccountID = Accounts.AccountID
+        WHERE Date BETWEEN '{calOneDate}' AND '{calTwoDate}'""").fetchall()
+    formatted_data = []
+    for item in data:
+        LogID = item[0]
+        AccountID = item[1]
+        Date = item[2] if item[2] is not None else 'N/A'
+        Time = item[3]
+        Action = item[4]
+        Before = item[5]
+        After = item[6]
+        User_Input = item[7]
+        Remarks = item[8]
+        formatted_data.append(f"{LogID}, {AccountID}, {Date}, {Time}, {Action}, {Before}, {After}, {User_Input}, {Remarks}")
+    for row in formatted_data:
+        viewLogsListbox.insert(END, row)
+    viewLogsListbox.pack(side=LEFT)
+
+    #Creates scroll bar
+    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=viewLogsListbox.yview)
+    listboxScrollbar.pack(side="right", fill=Y)
+    viewLogsListbox.config(yscrollcommand=listboxScrollbar.set)

@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import ttk
 import datetime
 import re
 import sqlite3
@@ -15,7 +14,6 @@ standardHeight = 30
 standardWidth = 250
 standardFont = "", 18
 standardYPadding = 10
-standardxPadding = 10
 
 # Defining colour mode for the program (light or dark)
 ctk.set_appearance_mode("dark")
@@ -41,20 +39,14 @@ root.state('zoomed')
 # Creating the frames the widgets sit in
 mainFrame = ctk.CTkFrame(root)
 mainFrame.pack(fill="both", expand=True)
-
-leftFrame = ctk.CTkFrame(mainFrame, width= 400, height= 720)
-leftFrame.pack(side='left', padx=standardxPadding)
-leftFrame.pack_propagate(False)
-
-leftTopFrame = ctk.CTkFrame(leftFrame, fg_color="#292929", width= 400, height= 720)
-leftTopFrame.pack(pady=standardYPadding)
-
-leftBottomFrame = ctk.CTkFrame(leftFrame, fg_color="#292929", width= 400, height= 720)
-leftBottomFrame.pack()
-
+leftFrame = ctk.CTkFrame(mainFrame)
+leftFrame.pack(side='left', fill="both", expand=True)
+leftTopFrame = ctk.CTkFrame(leftFrame, fg_color="#1f1f1f")
+leftTopFrame.pack(fill="both", expand=True)
+leftBottomFrame = ctk.CTkFrame(leftFrame, fg_color="#292929")
+leftBottomFrame.pack(fill="both", expand=True)
 middleFrame = ctk.CTkFrame(mainFrame)
 middleFrame.pack(side='left', fill="both", expand=True)
-
 rightFrame = ctk.CTkFrame(mainFrame)
 rightFrame.pack(side='left', fill="both", expand=True)
 
@@ -4845,9 +4837,10 @@ def viewLogsOptions():
     label.pack(pady = standardYPadding)
 
     calOne = DateEntry(middleFrame, 
-        width=20, 
+        width=30, 
         year=Year, 
-        month=Month,
+        month=Month, 
+        day=Day, 
         background='darkblue', 
         foreground='white', 
         borderwidth=5,
@@ -4860,9 +4853,10 @@ def viewLogsOptions():
     label.pack(pady = standardYPadding)
 
     calTwo = DateEntry(middleFrame, 
-        width=20, 
+        width=30, 
         year=Year, 
         month=Month, 
+        day=Day, 
         background='darkblue', 
         foreground='white', 
         borderwidth=5,
@@ -4875,7 +4869,7 @@ def viewLogsOptions():
         middleFrame,
         text= "Get Logs",
         font= standardFont,
-        width= 300,
+        width= 500,
         height= standardHeight,
         command=lambda: getLogs(calOne,calTwo),
         )
@@ -4884,88 +4878,50 @@ def viewLogsOptions():
 
 def getLogs(calOne,calTwo):
 
-    for widgets in rightFrame.winfo_children():
-        widgets.destroy()
-
     calOneDate = calOne.get_date()
-    calOneDate= str(calOneDate)
-    year, month, day = calOneDate.split('-')
-    calOneDate = f"{day}/{month}/{year}"
+    calOneDate = datetime.strtime(calOneDate, "%m/%d/%y").strftime("%d/%m/%Y")
+    print("Selected date:", calOneDate)
 
     calTwoDate = calTwo.get_date()
-    calTwoDate= str(calTwoDate)
-    year, month, day = calTwoDate.split('-')
-    calTwoDate = f"{day}/{month}/{year}"
+    calTwoDate = datetime.strtime(calTwoDate, "%m/%d/%y").strftime("%d/%m/%Y")
+    print("Selected date:", calTwoDate)
 
-    data=[]
+    #Create frame
+    listboxFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
+    listboxFrame.pack(pady = standardYPadding)
+
+    #Creates list box and fills it with members names using SQL
+    viewLogsListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height=25, font= standardFont)
     cursor = connection.cursor()
+    data = cursor.execute(f"SELECT LogID,AccountID,Date,Time,Before,After,User_Input,Remarks FROM ActionsLogs").fetchall()
     data = cursor.execute(f"""
         SELECT ActionsLogs.LogID,Accounts.Username,ActionsLogs.Date,ActionsLogs.Time,Actions.Action,ActionsLogs.Before,ActionsLogs.After,ActionsLogs.User_Input,ActionsLogs.Remarks
         FROM ActionsLogs
         INNER JOIN Actions
         ON ActionsLogs.ActionID = Actions.ActionID
         INNER JOIN Accounts
-        ON Accounts.AccountID = Accounts.AccountID
-        WHERE Date BETWEEN '{calOneDate}' AND '{calTwoDate}'""").fetchall()
-    
-    #Create frame
-    treeviewFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
-    treeviewFrame.pack(pady = standardYPadding)
-
-    ttk.Style().theme_use("clam")
-    ttk.Style().configure("Treeview", background="#292929",foreground="White")
-    ttk.Style().configure('Treeview.Heading', background='#292929', foreground='White')
-
-    columns = ("LogID", "Username", "Date", "Time", "Action", "Before", "After", "UserInput", "Remarks")
-    actionLogsTreeview = ttk.Treeview(
-        treeviewFrame, 
-        columns=columns, 
-        show="headings",
-        height= 40)
-
-    actionLogsTreeview.column("# 1",anchor=W, stretch=False, width=100)
-    actionLogsTreeview.heading("# 1", text="LogID")
-    actionLogsTreeview.column("# 2", anchor=W, stretch=False, width=180)
-    actionLogsTreeview.heading("# 2", text="Username")
-    actionLogsTreeview.column("# 3", anchor=W, stretch=False, width=80)
-    actionLogsTreeview.heading("# 3", text="Date")
-    actionLogsTreeview.column("# 4", anchor=W, stretch=False, width=80)
-    actionLogsTreeview.heading("# 4", text="Time")
-    actionLogsTreeview.column("# 5", anchor=W, stretch=False, width=200)
-    actionLogsTreeview.heading("# 5", text="Action")
-    actionLogsTreeview.column("# 6", anchor=W, stretch=False, width=100)
-    actionLogsTreeview.heading("# 6", text="Before")
-    actionLogsTreeview.column("# 7", anchor=W, stretch=False, width=200)
-    actionLogsTreeview.heading("# 7", text="After")
-    actionLogsTreeview.column("# 8", anchor=W, stretch=False, width=100)
-    actionLogsTreeview.heading("# 8", text="UserInput")
-    actionLogsTreeview.column("# 9", anchor=W, stretch=False, width=100)
-    actionLogsTreeview.heading("# 9", text="Remarks")
-    
-    
-        
-    for row in data:
-        actionLogsTreeview.insert("", "end", values=row)
-    actionLogsTreeview.pack(pady=20,side=LEFT)
-
-    Date= datetime.datetime.now().strftime("%d/%m/%Y")
-    Time= datetime.datetime.now().strftime("%H:%M:%S")
-    ActionID= "27"
-    Before= calOneDate
-    After= calTwoDate
-    User_Input= "N/A"
-    Remarks= "Admin"
-    cursor = connection.cursor()
-    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
-    connection.commit()
+        ON ActionsLogs.AccountID = Accounts.AccountID
+        WHERE Date BETWEEN {calOneDate} AND {calTwoDate}""").fetchall()
+    formatted_data = []
+    for item in data:
+        LogID = item[0]
+        AccountID = item[1]
+        Date = item[2] if item[2] is not None else 'N/A'
+        Time = item[3]
+        Action = item[4]
+        Before = item[5]
+        After = item[6]
+        User_Input = item[7]
+        Remarks = item[8]
+        formatted_data.append(f"{LogID}, {AccountID}, {Date}, {Time}, {Action}, {Before}, {After}, {User_Input}, {Remarks}")
+    for row in formatted_data:
+        viewLogsListbox.insert(END, row)
+    viewLogsListbox.pack(side=LEFT)
 
     #Creates scroll bar
-    treeviewScrollbarY= ctk.CTkScrollbar(treeviewFrame, command=actionLogsTreeview.yview)
-    treeviewScrollbarY.pack(side="right", fill=Y)
-    actionLogsTreeview.config(yscrollcommand=treeviewScrollbarY.set)
-    treeviewScrollbarX= ctk.CTkScrollbar(treeviewFrame, command=actionLogsTreeview.xview)
-    treeviewScrollbarX.pack(fill=X)
-    actionLogsTreeview.config(xscrollcommand=treeviewScrollbarX.set)
+    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=viewLogsListbox.yview)
+    listboxScrollbar.pack(side="right", fill=Y)
+    viewLogsListbox.config(yscrollcommand=listboxScrollbar.set)
 
 
 ##################################################################################################################
