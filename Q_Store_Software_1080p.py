@@ -14,8 +14,8 @@ connection = sqlite3.connect("505_ACU_Q-Store_Database.db")
 standardHeight = 30
 standardWidth = 250
 standardFont = "", 18
-standardYPadding = 10
-standardxPadding = 10
+standardYPadding = 5
+standardXPadding = 5
 
 # Defining colour mode for the program (light or dark)
 ctk.set_appearance_mode("dark")
@@ -42,21 +42,25 @@ root.state('zoomed')
 mainFrame = ctk.CTkFrame(root)
 mainFrame.pack(fill="both", expand=True)
 
-leftFrame = ctk.CTkFrame(mainFrame, width= 400, height= 720)
-leftFrame.pack(side='left', padx=standardxPadding)
+leftFrame = ctk.CTkFrame(mainFrame, fg_color= "#1f1f1f", width= 330, height= 850)
+leftFrame.pack(side='left', padx=standardXPadding)
 leftFrame.pack_propagate(False)
 
-leftTopFrame = ctk.CTkFrame(leftFrame, fg_color="#292929", width= 400, height= 720)
+leftTopFrame = ctk.CTkFrame(leftFrame, fg_color="#292929", width= 330, height= 300)
 leftTopFrame.pack(pady=standardYPadding)
+leftTopFrame.pack_propagate(False)
 
-leftBottomFrame = ctk.CTkFrame(leftFrame, fg_color="#292929", width= 400, height= 720)
-leftBottomFrame.pack()
+leftBottomFrame = ctk.CTkFrame(leftFrame, fg_color="#292929", width= 330, height= 545)
+leftBottomFrame.pack(pady=standardYPadding)
+leftBottomFrame.pack_propagate(False)
 
-middleFrame = ctk.CTkFrame(mainFrame)
-middleFrame.pack(side='left', fill="both", expand=True)
+middleFrame = ctk.CTkFrame(mainFrame, fg_color="#292929", width= 320, height= 850)
+middleFrame.pack(side='left', pady=standardYPadding, padx=standardXPadding)
+middleFrame.pack_propagate(False)
 
-rightFrame = ctk.CTkFrame(mainFrame)
-rightFrame.pack(side='left', fill="both", expand=True)
+rightFrame = ctk.CTkFrame(mainFrame, fg_color="#292929", width= 600, height= 850)
+rightFrame.pack(side='left', pady=standardYPadding, padx=standardXPadding)
+rightFrame.pack_propagate(False)
 
 
 ##################################################################################################################
@@ -69,7 +73,7 @@ def createLogInWindow():
     # Creates a ctk label
     passwordLabel = ctk.CTkLabel(
         leftTopFrame,
-        text="Please Enter Your Username And Password",
+        text="Please Enter Your \n Username And Password",
         font=standardFont
     )
     passwordLabel.pack(pady=standardYPadding)
@@ -565,7 +569,7 @@ def addAACMemberOptions():
     listboxFrame.pack(pady = standardYPadding)
 
     #Creates list box and puts names into listbox using SQL
-    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 30, height= 25, font= standardFont)
+    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 30, height= 23, font= standardFont)
     cursor = connection.cursor()
     data = cursor.execute("SELECT rank,first_name,last_name FROM Cadets").fetchall()
     formatted_data = []
@@ -868,7 +872,7 @@ def changeRankOptions():
     listboxFrame.pack(pady = standardYPadding)
 
     #Creating list box and inserting contents of database into it using SQL
-    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 25, height= 15, font= standardFont)
+    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 30, height= 25, font= standardFont)
     cursor = connection.cursor()
     data = cursor.execute("SELECT CadetID,rank,first_name,last_name FROM Cadets").fetchall()
     formatted_data = []
@@ -1021,20 +1025,20 @@ def listStores():
         widgets.destroy()
 
     #Creates a canvas
-    canvas = ctk.CTkCanvas(middleFrame, bg= "#292929", highlightthickness=0)
-    canvas.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+    canvas = ctk.CTkCanvas(middleFrame, bg= "#292929", highlightthickness=0, width= 450, height= 1300)
+    canvas.pack(side="left")
 
     #Creats scroll bar
     buttonScrollbar= ctk.CTkScrollbar(middleFrame, orientation=VERTICAL, command=canvas.yview)
-    buttonScrollbar.pack(side="right", fill=Y)
+    buttonScrollbar.pack(side="left", fill=Y)
 
     #Assigns scroll bar to the canvas
     canvas.configure(yscrollcommand=buttonScrollbar.set)
-    canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion= canvas.bbox("all")))
+    canvas.bind('<Configure>', lambda e : canvas.configure(scrollregion= canvas.bbox("all")))
 
     #Creates a frame
-    buttonFrame= ctk.CTkFrame(canvas, fg_color= "#292929")
-    buttonFrame.pack(pady = standardYPadding)
+    buttonFrame= ctk.CTkFrame(canvas, fg_color= "#292929", width= 450, height= 1300)
+    buttonFrame.pack()
 
     #Creats widnow within the canvas
     canvas.create_window((0,0), window=buttonFrame, anchor= "nw")
@@ -1081,7 +1085,7 @@ def listStoresViewStores(categoryID):
     listboxFrame.pack(pady = standardYPadding)
 
     #Create list box and writes the contents of the database into it
-    storesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height=25, font= standardFont)
+    storesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 35, height=25, font= standardFont)
     cursor = connection.cursor()
     data = cursor.execute(f"SELECT StoreID,Name,Size,Qty FROM Stores WHERE CategoryID={categoryID}").fetchall()
     formatted_data = []
@@ -1190,7 +1194,7 @@ def orderingOptions():
     listboxFrame.pack()
 
     #Creates a listbox and inserts the contents of the file into it
-    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 25, height= 17, font= standardFont)
+    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 25, height= 15, font= standardFont)
     cursor = connection.cursor()
     data = cursor.execute("SELECT CadetID,rank,first_name,last_name FROM Cadets").fetchall()
     formattedDataName = []
@@ -2053,15 +2057,15 @@ def storesReturns():
         widgets.destroy()
 
     #Creates a ctk label
-    label = ctk.CTkLabel(leftBottomFrame, text="Select The Person Returning", fg_color="transparent", font= standardFont)
+    label = ctk.CTkLabel(middleFrame, text="Select The Person Returning", fg_color="transparent", font= standardFont)
     label.pack(pady = standardYPadding)
 
     #Creats a ctk frame
-    listboxFrame= ctk.CTkFrame(leftBottomFrame, fg_color= "#292929")
+    listboxFrame= ctk.CTkFrame(middleFrame, fg_color= "#292929")
     listboxFrame.pack()
 
     #Creates a listbox and insert contents from file into it
-    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 25, height= 17, font= standardFont)
+    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 25, height= 25, font= standardFont)
     cursor = connection.cursor()
     data = cursor.execute("SELECT CadetID,rank,first_name,last_name FROM Cadets").fetchall()
     formatted_data = []
@@ -2069,7 +2073,7 @@ def storesReturns():
         formatted_data.append(' '.join(map(str, row)))
     for row in formatted_data:
         namesListListbox.insert(END, row)
-    namesListListbox.pack(side=LEFT)
+    namesListListbox.pack(side=LEFT, pady=standardYPadding)
 
     #Creates a ctk scrollbar
     listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=namesListListbox.yview)
@@ -2077,18 +2081,29 @@ def storesReturns():
     namesListListbox.config(yscrollcommand=listboxScrollbar.set)
 
     #Creates a ctk button 
-    selectPersonOrderingButton = ctk.CTkButton(
-        leftBottomFrame,
-        text= "Select Person Returning",
+    viewShortTermLogsButton = ctk.CTkButton(
+        middleFrame,
+        text= "View Short Term Logs",
         font= standardFont,
         width= standardWidth,
         height= standardHeight,
-        command=lambda: selectedPersonReturning(namesListListbox),
+        command=lambda: shortTermSelctionCheck(namesListListbox),
         )
-    selectPersonOrderingButton.pack(pady = standardYPadding)
+    viewShortTermLogsButton.pack(pady = standardYPadding)
+
+    #Creates a ctk button 
+    viewLongTermLogsButton = ctk.CTkButton(
+        middleFrame,
+        text= "View Long Term Logs",
+        font= standardFont,
+        width= standardWidth,
+        height= standardHeight,
+        command=lambda: longTermSelctionCheck(namesListListbox),
+        )
+    viewLongTermLogsButton.pack(pady = standardYPadding)
 
 
-def selectedPersonReturning(namesListListbox):
+def shortTermSelctionCheck(namesListListbox):
     #Makes variable global
     global rankNameClean
     #Gets users selection of the listbox
@@ -2130,89 +2145,59 @@ def selectedPersonReturning(namesListListbox):
         CadetID = rankNameClean.split('_')[0]
 
         #Calls the function
-        viewLogs()
+        viewShortTermLogs()
 
 
-def viewLogs():
+def longTermSelctionCheck(namesListListbox):
+    #Makes variable global
+    global rankNameClean
+    #Gets users selection of the listbox
+    rankNameSelection= namesListListbox.curselection()
+    #Checks if there was no selection
+    if not rankNameSelection:
+        #Creates a ctk window
+        errorWindow= ctk.CTkToplevel(root)
+        errorWindow.title("Error Window")
+        errorWindow.geometry("1200x500")
+        errorWindow.transient(root)
+        errorWindow.lift()
+        
+        #Creates a ctk label
+        errorLabel= ctk.CTkLabel(
+            errorWindow,
+            text= "You have not selected a person, Please try again.",
+            font= standardFont
+            )
+        errorLabel.pack(pady= standardYPadding)
+
+        #Creates a ctk button
+        errorButton= ctk.CTkButton(
+            errorWindow,
+            text= "Close Window",
+            font= standardFont,
+            width= standardWidth,
+            height= standardHeight,
+            command= errorWindow.destroy
+            )
+        errorButton.pack(pady= standardYPadding)
+
+    #Runs if there was a seletion
+    else:
+        #Gets the name from the seelection and gets rid of unwanted charactors and turns it into a string
+        rankName= namesListListbox.get(rankNameSelection[0])
+        rankNameClean= str(rankName).replace("(", "").replace("'", "").replace(",", "").replace(" ", "_").replace(")", "")
+        global CadetID
+        CadetID = rankNameClean.split('_')[0]
+
+        #Calls the function
+        viewLongTermLogs()
+
+
+def viewShortTermLogs():
 
     #Clears all widgits from window
-    for widgets in middleFrame.winfo_children():
-        widgets.destroy()
     for widgets in rightFrame.winfo_children():
         widgets.destroy()
-    
-
-    #Creates a ctk label
-    longTermLoglabel = ctk.CTkLabel(middleFrame, text="Long Term Log \nFORMAT = LogID, [StoreID] Name Size, QTY, Date", fg_color="transparent", font= standardFont)
-    longTermLoglabel.pack(pady = standardYPadding)
-
-    #Creates a ctk frame
-    listboxFrame= ctk.CTkFrame(middleFrame, fg_color= "#292929")
-    listboxFrame.pack()
-
-    #Makes global variable
-    global formatted_dataLong         
-
-    #Creates a listbox and insert contents from file into it
-    longTermLogListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height= 28, font= standardFont)
-    #Gets all required data from database using SQL and formats it into desired format
-    cursor = connection.cursor()
-    dataLogsLong = cursor.execute(f"SELECT Logs.LogID,Logs.StoreID,Logs.Qty_Taken,Logs.Date_Taken FROM Logs WHERE Logs.Log_TypeID = 2 AND Logs.CadetID = {CadetID};").fetchall()
-    #dataInnerJoinLong = cursor.execute(f"SELECT Stores.Name, Logs.StoreID FROM Logs INNER JOIN Stores ON Logs.StoreID = Stores.StoreID WHERE Logs.Log_TypeID = 2 AND Logs.CadetID = {CadetID};").fetchall()
-    formatted_dataLong = []
-    for itemLogsLong in dataLogsLong:
-
-        LogIDLong = itemLogsLong[0]
-        cursor = connection.cursor()
-        dataInnerJoinLong = cursor.execute(f"SELECT Stores.Name, Logs.StoreID FROM Logs INNER JOIN Stores ON Logs.StoreID = Stores.StoreID WHERE Logs.LogID = {LogIDLong};").fetchall()
-        
-        for ItemInnerJoinLong in dataInnerJoinLong:
-
-            StoreID = ItemInnerJoinLong[1]
-            cursor = connection.cursor()
-            storesDataLong= cursor.execute(f"SELECT Size FROM Stores WHERE StoreID= {StoreID}")
-
-            for itemStoresLong in storesDataLong:
-                NameLong = ItemInnerJoinLong[0]
-                SizeLong = itemStoresLong[0] if itemStoresLong[0] is not None else 'N/A'
-                Qty_TakenLong = itemLogsLong[2]
-                Date_TakenLong = itemLogsLong[3]
-                formatted_dataLong.append(f"{LogIDLong}, [{StoreID}] {NameLong} {SizeLong}, {Qty_TakenLong}, {Date_TakenLong}")
-    
-    #Inserts formated data into listbox
-    for rowLong in formatted_dataLong:
-        longTermLogListbox.insert(END, rowLong)
-    longTermLogListbox.pack(side=LEFT)
-
-    #Creates a ctk scrollbar
-    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=longTermLogListbox.yview)
-    listboxScrollbar.pack(side="right", fill=Y)
-    longTermLogListbox.config(yscrollcommand=listboxScrollbar.set)
-
-    #Creates a ctk frame
-    frameOne= ctk.CTkFrame(middleFrame, fg_color= "#292929")
-    frameOne.pack()
-
-    #Creates a ctk entry box
-    quantityReturnEntryLong = ctk.CTkEntry(
-        frameOne, 
-        placeholder_text="Enter Quantity Returned",
-        font= standardFont,
-        width= 210,
-        height= standardHeight,
-        )
-    quantityReturnEntryLong.pack(side= "left", padx = 10, pady = 20)
-
-    #Creates a ctk button 
-    changeQuantityButtonLong = ctk.CTkButton(
-        frameOne,
-        text= "Update Quantity",
-        font= standardFont,
-        width= 100,
-        height= standardHeight,
-        command= lambda: longTermLogReturn(longTermLogListbox,quantityReturnEntryLong),
-        )
-    changeQuantityButtonLong.pack(side= "right", padx = 10, pady = 20)
 
     #Creates a ctk label
     shortTermLogLabel = ctk.CTkLabel(rightFrame, text="Short Term Log \nFORMAT = LogID, [StoreID] Name Size, QTY, Date", fg_color="transparent", font= standardFont)
@@ -2285,28 +2270,107 @@ def viewLogs():
     changeQuantityButtonShort.pack(side= "right", padx = 10, pady = 20)
 
 
-def longTermLogReturn(longTermLogListbox,quantityReturnEntryLong):
+def viewLongTermLogs():
+    #Clears all widgits from window
+    for widgets in rightFrame.winfo_children():
+        widgets.destroy()
+    
+
+    #Creates a ctk label
+    longTermLoglabel = ctk.CTkLabel(rightFrame, text="Long Term Log \nFORMAT = LogID, [StoreID] Name Size, QTY, Date", fg_color="transparent", font= standardFont)
+    longTermLoglabel.pack(pady = standardYPadding)
+
+    #Creates a ctk frame
+    listboxFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
+    listboxFrame.pack()
+
+    #Makes global variable
+    global formatted_dataLong         
+
+    #Creates a listbox and insert contents from file into it
+    longTermLogListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 40, height= 28, font= standardFont)
+    #Gets all required data from database using SQL and formats it into desired format
+    cursor = connection.cursor()
+    dataLogsLong = cursor.execute(f"SELECT Logs.LogID,Logs.StoreID,Logs.Qty_Taken,Logs.Date_Taken FROM Logs WHERE Logs.Log_TypeID = 2 AND Logs.CadetID = {CadetID};").fetchall()
+    #dataInnerJoinLong = cursor.execute(f"SELECT Stores.Name, Logs.StoreID FROM Logs INNER JOIN Stores ON Logs.StoreID = Stores.StoreID WHERE Logs.Log_TypeID = 2 AND Logs.CadetID = {CadetID};").fetchall()
+    formatted_dataLong = []
+    for itemLogsLong in dataLogsLong:
+
+        LogIDLong = itemLogsLong[0]
+        cursor = connection.cursor()
+        dataInnerJoinLong = cursor.execute(f"SELECT Stores.Name, Logs.StoreID FROM Logs INNER JOIN Stores ON Logs.StoreID = Stores.StoreID WHERE Logs.LogID = {LogIDLong};").fetchall()
+        
+        for ItemInnerJoinLong in dataInnerJoinLong:
+
+            StoreID = ItemInnerJoinLong[1]
+            cursor = connection.cursor()
+            storesDataLong= cursor.execute(f"SELECT Size FROM Stores WHERE StoreID= {StoreID}")
+
+            for itemStoresLong in storesDataLong:
+                NameLong = ItemInnerJoinLong[0]
+                SizeLong = itemStoresLong[0] if itemStoresLong[0] is not None else 'N/A'
+                Qty_TakenLong = itemLogsLong[2]
+                Date_TakenLong = itemLogsLong[3]
+                formatted_dataLong.append(f"{LogIDLong}, [{StoreID}] {NameLong} {SizeLong}, {Qty_TakenLong}, {Date_TakenLong}")
+    
+    #Inserts formated data into listbox
+    for rowLong in formatted_dataLong:
+        longTermLogListbox.insert(END, rowLong)
+    longTermLogListbox.pack(side=LEFT)
+
+    #Creates a ctk scrollbar
+    listboxScrollbar= ctk.CTkScrollbar(listboxFrame, command=longTermLogListbox.yview)
+    listboxScrollbar.pack(side="right", fill=Y)
+    longTermLogListbox.config(yscrollcommand=listboxScrollbar.set)
+
+    #Creates a ctk frame
+    frameOne= ctk.CTkFrame(rightFrame, fg_color= "#292929")
+    frameOne.pack()
+
+    #Creates a ctk entry box
+    quantityReturnEntryLong = ctk.CTkEntry(
+        frameOne, 
+        placeholder_text="Enter Quantity Returned",
+        font= standardFont,
+        width= 210,
+        height= standardHeight,
+        )
+    quantityReturnEntryLong.pack(side= "left", padx = 10, pady = 20)
+
+    #Creates a ctk button 
+    changeQuantityButtonLong = ctk.CTkButton(
+        frameOne,
+        text= "Update Quantity",
+        font= standardFont,
+        width= 100,
+        height= standardHeight,
+        command= lambda: longTermLogReturn(longTermLogListbox,quantityReturnEntryLong),
+        )
+    changeQuantityButtonLong.pack(side= "right", padx = 10, pady = 20)
+
+
+def shortTermLogReturn(shortTermLogListbox,quantityReturnEntryShort):
     #Gets listbox selection
-    rowSelection = longTermLogListbox.curselection()
+    rowSelection = shortTermLogListbox.curselection()
 
     #Runs if there was a selection
     if rowSelection:
         #Sets all important information into the variables
-        row= longTermLogListbox.get(rowSelection[0])
+        row= shortTermLogListbox.get(rowSelection[0])
         rowClean= str(row).replace('[','').replace(']',',').split(',')
         LogID= rowClean[0]
         StoreID= rowClean[1]
-        rowLong = rowClean[3]
-        oldValueLong= int(rowLong[1])
-        quantityReturnLong = int(quantityReturnEntryLong.get())
-        newQuantity= oldValueLong - quantityReturnLong
+        rowShort = rowClean[3]
+        oldValueShort= int(rowShort[1])
+        quantityReturnShort = int(quantityReturnEntryShort.get())
+        newQuantity= oldValueShort - quantityReturnShort
 
         #Checks if new quantity is equal to 0
         if newQuantity == 0:
-
+            
             #Updates the qty in logs while deleating it from the logs on the database using SQL
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnLong} WHERE StoreID= {StoreID}")
+            cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnShort} WHERE StoreID= {StoreID}")
             cursor.execute(f"DELETE FROM Logs WHERE LogID= {LogID}").fetchall()
             connection.commit()
 
@@ -2320,24 +2384,24 @@ def longTermLogReturn(longTermLogListbox,quantityReturnEntryLong):
 
             Date= datetime.datetime.now().strftime("%d/%m/%Y")
             Time= datetime.datetime.now().strftime("%H:%M:%S")
-            ActionID= "26"
-            Before= oldValueLong
+            ActionID= "25"
+            Before= oldValueShort
             After= newQuantity
-            User_Input= quantityReturnLong
+            User_Input= quantityReturnShort
             Remarks= f"{Rank} {First_Name} {Last_Name}"
             cursor = connection.cursor()
             cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
             connection.commit()
 
-            viewLogs()
-
+            viewShortTermLogs()
+            
         #Checks if new quantity is bigger than 0
         elif newQuantity > 0:
 
             #Updates the qty in logs while updating it from the logs on the database using SQL
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnLong} WHERE StoreID= {StoreID}")
-            cursor.execute(f"UPDATE Logs SET Qty_Taken= Qty_Taken - {quantityReturnLong} WHERE LogID= {LogID}").fetchall()
+            cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnShort} WHERE StoreID= {StoreID}")
+            cursor.execute(f"UPDATE Logs SET Qty_Taken= Qty_Taken - {quantityReturnShort} WHERE LogID= {LogID}").fetchall()
             connection.commit()
 
             cursor = connection.cursor()
@@ -2350,16 +2414,16 @@ def longTermLogReturn(longTermLogListbox,quantityReturnEntryLong):
 
             Date= datetime.datetime.now().strftime("%d/%m/%Y")
             Time= datetime.datetime.now().strftime("%H:%M:%S")
-            ActionID= "26"
-            Before= oldValueLong
+            ActionID= "25"
+            Before= oldValueShort
             After= newQuantity
-            User_Input= quantityReturnLong
+            User_Input= quantityReturnShort
             Remarks= f"{Rank} {First_Name} {Last_Name}"
             cursor = connection.cursor()
             cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
             connection.commit()
 
-            viewLogs()
+            viewShortTermLogs()
 
         #Checks if new quantity is smaller than 0
         elif newQuantity < 0:
@@ -2418,28 +2482,28 @@ def longTermLogReturn(longTermLogListbox,quantityReturnEntryLong):
         errorButton.pack(pady= standardYPadding)
 
 
-def shortTermLogReturn(shortTermLogListbox,quantityReturnEntryShort):
+def longTermLogReturn(longTermLogListbox,quantityReturnEntryLong):
     #Gets listbox selection
-    rowSelection = shortTermLogListbox.curselection()
+    rowSelection = longTermLogListbox.curselection()
 
     #Runs if there was a selection
     if rowSelection:
         #Sets all important information into the variables
-        row= shortTermLogListbox.get(rowSelection[0])
+        row= longTermLogListbox.get(rowSelection[0])
         rowClean= str(row).replace('[','').replace(']',',').split(',')
         LogID= rowClean[0]
         StoreID= rowClean[1]
-        rowShort = rowClean[3]
-        oldValueShort= int(rowShort[1])
-        quantityReturnShort = int(quantityReturnEntryShort.get())
-        newQuantity= oldValueShort - quantityReturnShort
+        rowLong = rowClean[3]
+        oldValueLong= int(rowLong[1])
+        quantityReturnLong = int(quantityReturnEntryLong.get())
+        newQuantity= oldValueLong - quantityReturnLong
 
         #Checks if new quantity is equal to 0
         if newQuantity == 0:
-            
+
             #Updates the qty in logs while deleating it from the logs on the database using SQL
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnShort} WHERE StoreID= {StoreID}")
+            cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnLong} WHERE StoreID= {StoreID}")
             cursor.execute(f"DELETE FROM Logs WHERE LogID= {LogID}").fetchall()
             connection.commit()
 
@@ -2453,24 +2517,24 @@ def shortTermLogReturn(shortTermLogListbox,quantityReturnEntryShort):
 
             Date= datetime.datetime.now().strftime("%d/%m/%Y")
             Time= datetime.datetime.now().strftime("%H:%M:%S")
-            ActionID= "25"
-            Before= oldValueShort
+            ActionID= "26"
+            Before= oldValueLong
             After= newQuantity
-            User_Input= quantityReturnShort
+            User_Input= quantityReturnLong
             Remarks= f"{Rank} {First_Name} {Last_Name}"
             cursor = connection.cursor()
             cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
             connection.commit()
 
-            viewLogs()
-            
+            viewLongTermLogs()
+
         #Checks if new quantity is bigger than 0
         elif newQuantity > 0:
 
             #Updates the qty in logs while updating it from the logs on the database using SQL
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnShort} WHERE StoreID= {StoreID}")
-            cursor.execute(f"UPDATE Logs SET Qty_Taken= Qty_Taken - {quantityReturnShort} WHERE LogID= {LogID}").fetchall()
+            cursor.execute(f"UPDATE Stores SET Qty= Qty + {quantityReturnLong} WHERE StoreID= {StoreID}")
+            cursor.execute(f"UPDATE Logs SET Qty_Taken= Qty_Taken - {quantityReturnLong} WHERE LogID= {LogID}").fetchall()
             connection.commit()
 
             cursor = connection.cursor()
@@ -2483,16 +2547,16 @@ def shortTermLogReturn(shortTermLogListbox,quantityReturnEntryShort):
 
             Date= datetime.datetime.now().strftime("%d/%m/%Y")
             Time= datetime.datetime.now().strftime("%H:%M:%S")
-            ActionID= "25"
-            Before= oldValueShort
+            ActionID= "26"
+            Before= oldValueLong
             After= newQuantity
-            User_Input= quantityReturnShort
+            User_Input= quantityReturnLong
             Remarks= f"{Rank} {First_Name} {Last_Name}"
             cursor = connection.cursor()
             cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
             connection.commit()
 
-            viewLogs()
+            viewLongTermLogs()
 
         #Checks if new quantity is smaller than 0
         elif newQuantity < 0:
