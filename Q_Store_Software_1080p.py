@@ -38,31 +38,51 @@ screenHeight = root.winfo_screenheight()
 root.geometry(f"{screenWidth}x{screenHeight}")
 root.state('zoomed')
 
-# Creating the frames the widgets sit in
+# Creating the main frame
 mainFrame = ctk.CTkFrame(root)
 mainFrame.pack(fill="both", expand=True)
 
-leftFrame = ctk.CTkFrame(mainFrame, fg_color= "#1f1f1f", width= 330, height= 850)
-leftFrame.pack(side='left', padx=standardXPadding)
+# Setting row and column weights for main frame
+mainFrame.rowconfigure(0, weight=1)
+mainFrame.columnconfigure(0, weight=1)
+mainFrame.columnconfigure(1, weight=1)
+mainFrame.columnconfigure(2, weight=5)
+
+# Creating the left frame
+leftFrame = ctk.CTkFrame(mainFrame, fg_color="#1f1f1f")
+leftFrame.grid(row=0, column=0, sticky="nsew", padx=standardXPadding)
+leftFrame.grid_propagate(False)
 leftFrame.pack_propagate(False)
 
-leftTopFrame = ctk.CTkFrame(leftFrame, fg_color="#292929", width= 330, height= 300)
-leftTopFrame.pack(pady=standardYPadding)
-leftTopFrame.pack_propagate(False)
-
-leftBottomFrame = ctk.CTkFrame(leftFrame, fg_color="#292929", width= 330, height= 545)
-leftBottomFrame.pack(pady=standardYPadding)
-leftBottomFrame.pack_propagate(False)
-
-middleFrame = ctk.CTkFrame(mainFrame, fg_color="#292929", width= 320, height= 850)
-middleFrame.pack(side='left', pady=standardYPadding, padx=standardXPadding)
+# Creating the middle frame
+middleFrame = ctk.CTkFrame(mainFrame, fg_color="#292929")
+middleFrame.grid(row=0, column=1, sticky="nsew", pady=standardYPadding, padx=standardXPadding)
+middleFrame.grid_propagate(False)
 middleFrame.pack_propagate(False)
 
-rightFrame = ctk.CTkFrame(mainFrame, fg_color="#292929", width= 600, height= 850)
-rightFrame.pack(side='left', pady=standardYPadding, padx=standardXPadding)
+# Creating the right frame
+rightFrame = ctk.CTkFrame(mainFrame, fg_color="#292929")
+rightFrame.grid(row=0, column=2, sticky="nsew", pady=standardYPadding, padx=standardXPadding)
+rightFrame.grid_propagate(False)
 rightFrame.pack_propagate(False)
 
+leftFrame.columnconfigure(0, weight=3)
+leftFrame.columnconfigure(2, weight=0)
+leftFrame.rowconfigure(0, weight=1)
+leftFrame.rowconfigure(1, weight=5)
 
+
+# Creating the left top frame
+leftTopFrame = ctk.CTkFrame(leftFrame, fg_color="#292929")
+leftTopFrame.grid(row=0, column=0, sticky="nsew", pady=standardYPadding)
+leftTopFrame.grid_propagate(False)
+leftTopFrame.pack_propagate(False)
+
+# Creating the left bottom frame
+leftBottomFrame = ctk.CTkFrame(leftFrame, fg_color="#292929")
+leftBottomFrame.grid(row=1, column=0, sticky="nsew", pady=standardYPadding)
+leftBottomFrame.grid_propagate(False)
+leftBottomFrame.pack_propagate(False)
 ##################################################################################################################
 
 
@@ -137,8 +157,7 @@ def startLogIn(usernameEntry,passwordEntry):
     usernames = []
     cursor = connection.cursor()
     data = cursor.execute(f"SELECT Username FROM Accounts").fetchall()
-    data = str(data).replace('(', '').replace(')', '').replace(',', '').replace("'", '').replace(" ", ',').replace(
-        "[", '').replace("]", '')
+    data = str(data).replace('(', '').replace(')', '').replace(',', '').replace("'", '').replace(" ", ',').replace("[", '').replace("]", '')
     data = data.split(',')
     for username in data:
         usernames.append(username)
