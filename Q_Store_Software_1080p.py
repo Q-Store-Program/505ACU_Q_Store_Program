@@ -7,8 +7,12 @@ from contextlib import closing
 import customtkinter as ctk
 import pyautogui
 from tkcalendar import DateEntry
+import os
+import csv
 
 connection = sqlite3.connect("505_ACU_Q-Store_Database.db")
+
+path= os.getcwd()
 
 # Defining variables to make it easier to change the size of everything
 standardHeight = 30
@@ -4985,26 +4989,22 @@ def getLogs(calOne,calTwo):
     data = cursor.execute(f"""
         SELECT ActionsLogs.LogID,Accounts.Username,ActionsLogs.Date,ActionsLogs.Time,Actions.Action,ActionsLogs.Before,ActionsLogs.After,ActionsLogs.User_Input,ActionsLogs.Remarks
         FROM ActionsLogs
-        INNER JOIN Actions
+        LEFT JOIN Actions
         ON ActionsLogs.ActionID = Actions.ActionID
-        INNER JOIN Accounts
-        ON Accounts.AccountID = Accounts.AccountID
+        LEFT JOIN Accounts
+        ON ActionsLogs.AccountID = Accounts.AccountID
         WHERE Date BETWEEN '{calOneDate}' AND '{calTwoDate}'""").fetchall()
     
     #Create frame
     treeviewFrame= ctk.CTkFrame(rightFrame, fg_color= "#292929")
-    treeviewFrame.pack(pady = standardYPadding)
+    treeviewFrame.pack()
 
     ttk.Style().theme_use("clam")
-    ttk.Style().configure("Treeview", background="#292929",foreground="White")
+    ttk.Style().configure("Treeview", background="#292929",foreground="White", fieldbackground="#292929")
     ttk.Style().configure('Treeview.Heading', background='#292929', foreground='White')
 
     columns = ("LogID", "Username", "Date", "Time", "Action", "Before", "After", "UserInput", "Remarks")
-    actionLogsTreeview = ttk.Treeview(
-        treeviewFrame, 
-        columns=columns, 
-        show="headings",
-        height= 40)
+    actionLogsTreeview = ttk.Treeview(treeviewFrame, columns=columns, show="headings", height= 40)
 
     actionLogsTreeview.column("# 1",anchor=W, stretch=False, width=100)
     actionLogsTreeview.heading("# 1", text="LogID")
@@ -5016,20 +5016,17 @@ def getLogs(calOne,calTwo):
     actionLogsTreeview.heading("# 4", text="Time")
     actionLogsTreeview.column("# 5", anchor=W, stretch=False, width=200)
     actionLogsTreeview.heading("# 5", text="Action")
-    actionLogsTreeview.column("# 6", anchor=W, stretch=False, width=100)
+    actionLogsTreeview.column("# 6", anchor=W, stretch=False, width=200)
     actionLogsTreeview.heading("# 6", text="Before")
     actionLogsTreeview.column("# 7", anchor=W, stretch=False, width=200)
     actionLogsTreeview.heading("# 7", text="After")
-    actionLogsTreeview.column("# 8", anchor=W, stretch=False, width=100)
+    actionLogsTreeview.column("# 8", anchor=W, stretch=False, width=200)
     actionLogsTreeview.heading("# 8", text="UserInput")
-    actionLogsTreeview.column("# 9", anchor=W, stretch=False, width=100)
+    actionLogsTreeview.column("# 9", anchor=W, stretch=False, width=200)
     actionLogsTreeview.heading("# 9", text="Remarks")
-    
-    
         
     for row in data:
         actionLogsTreeview.insert("", "end", values=row)
-    actionLogsTreeview.pack(pady=20,side=LEFT)
 
     Date= datetime.datetime.now().strftime("%d/%m/%Y")
     Time= datetime.datetime.now().strftime("%H:%M:%S")
@@ -5043,12 +5040,78 @@ def getLogs(calOne,calTwo):
     connection.commit()
 
     #Creates scroll bar
-    treeviewScrollbarY= ctk.CTkScrollbar(treeviewFrame, command=actionLogsTreeview.yview)
-    treeviewScrollbarY.pack(side="right", fill=Y)
+    treeviewScrollbarY= ttk.Scrollbar(treeviewFrame, command=actionLogsTreeview.yview)
+    treeviewScrollbarY.pack(side=LEFT, fill=Y)
     actionLogsTreeview.config(yscrollcommand=treeviewScrollbarY.set)
-    treeviewScrollbarX= ctk.CTkScrollbar(treeviewFrame, command=actionLogsTreeview.xview)
-    treeviewScrollbarX.pack(fill=X)
-    actionLogsTreeview.config(xscrollcommand=treeviewScrollbarX.set)
+    
+    actionLogsTreeview.pack(side=RIGHT)
+
+    horizontal_scrollbar = ttk.Scrollbar(rightFrame, orient=HORIZONTAL, command=actionLogsTreeview.xview)
+    horizontal_scrollbar.pack(fill="x")
+    horizontal_scrollbar.configure(command=actionLogsTreeview.xview)
+    actionLogsTreeview.configure(xscrollcommand=horizontal_scrollbar.set)
+    
+    #Creates a button
+    getLogsButton = ctk.CTkButton(
+        rightFrame,
+        text= "Download Logs",
+        font= standardFont,
+        width= 300,
+        height= standardHeight,
+        command=lambda: downloadLogs(calOneDate,calTwoDate),
+        )
+    getLogsButton.pack(pady = 10)
+
+    
+def downloadLogs(calOneDate,calTwoDate):
+
+    data=[]
+    cursor = connection.cursor()
+    data = cursor.execute(f"""
+        SELECT ActionsLogs.LogID,Accounts.Username,ActionsLogs.Date,ActionsLogs.Time,Actions.Action,ActionsLogs.Before,ActionsLogs.After,ActionsLogs.User_Input,ActionsLogs.Remarks
+        FROM ActionsLogs
+        LEFT JOIN Actions
+        ON ActionsLogs.ActionID = Actions.ActionID
+        LEFT JOIN Accounts
+        ON ActionsLogs.AccountID = Accounts.AccountID
+        WHERE Date BETWEEN '{calOneDate}' AND '{calTwoDate}'""").fetchall()
+    
+    with open(path+"/namesList.csv", 'w', newline='') as file:
+        writer = csv.writer(file)
+
+    downloads_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
+
+    # Define the file name and content
+    file_name = f'Action_Logs_({calOneDate}_to_{calTwoDate}).csv'
+
+    # Create the file path
+    file_path = os.path.join(downloads_folder, file_name)
+
+    file_path=file_path.replace("/","-")
+
+    # Write the content to the file
+    with open(file_path, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data)
+
+    # Get the path to the Downloads folder based on the user's operating system
+    downloads_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
+
+    # Open the Downloads folder using the default file explorer
+    os.startfile(downloads_folder)
+
+    Date= datetime.datetime.now().strftime("%d/%m/%Y")
+    Time= datetime.datetime.now().strftime("%H:%M:%S")
+    ActionID= "28"
+    Before= "N/A"
+    After= "N/A"
+    User_Input= "N/A"
+    Remarks= "N/A"
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO ActionsLogs (AccountID,Date,Time,ActionID,Before,After,User_Input,Remarks) VALUES ('{loggedInAccountID}','{Date}','{Time}','{ActionID}','{Before}','{After}','{User_Input}','{Remarks}')").fetchall()
+    connection.commit()
+
+    viewLogsOptions()
 
 
 ##################################################################################################################

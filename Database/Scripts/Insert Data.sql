@@ -334,4 +334,5 @@ VALUES
 ('Selected_Long_Term_Log'),
 ('Returned_Short_Term_Stores'),
 ('Returned_Long_Term_Stores'),
-('View_Action_Logs');
+('View_Action_Logs')
+('Download_Action_Logs');
