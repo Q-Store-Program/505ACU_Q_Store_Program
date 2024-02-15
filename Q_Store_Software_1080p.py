@@ -75,7 +75,6 @@ leftFrame.columnconfigure(2, weight=0)
 leftFrame.rowconfigure(0, weight=1)
 leftFrame.rowconfigure(1, weight=5)
 
-
 # Creating the left top frame
 leftTopFrame = ctk.CTkFrame(leftFrame, fg_color="#292929")
 leftTopFrame.grid(row=0, column=0, sticky="nsew", pady=standardYPadding)
@@ -174,7 +173,7 @@ def startLogIn(usernameEntry,passwordEntry):
         # Creates a ctk label
         passwordErrorLabel = ctk.CTkLabel(
             leftTopFrame,
-            text="Incorrect Username. Return to log in page and try again.",
+            text="Incorrect Username. \n Return to log in page and try again.",
             font=standardFont
         )
         passwordErrorLabel.pack(pady=standardYPadding)
@@ -260,7 +259,7 @@ def startForgotPassword():
         leftTopFrame,
         placeholder_text="Enter Username",
         font=standardFont,
-        width=400,
+        width=standardWidth,
         height=standardHeight,
     )
     usernameEntry.pack(pady=standardYPadding)
@@ -270,7 +269,7 @@ def startForgotPassword():
         leftTopFrame,
         text="Next",
         font=standardFont,
-        width=400,
+        width=standardWidth,
         height=standardHeight,
         command=lambda: startGetPassword(usernameEntry)
     )
@@ -281,7 +280,7 @@ def startForgotPassword():
         leftTopFrame,
         text="Return to Log In Page",
         font=standardFont,
-        width=400,
+        width=standardWidth,
         height=standardHeight,
         command=createLogInWindow,
     )
@@ -4235,7 +4234,7 @@ def addAccount(namesListListbox,passwordEntry,confirmedPasswordEntry,secretQuest
         cadetID= str(row).split(" ")[0]
         firstName= str(row).split(" ")[2]
         lastName= str(row).split(" ")[3]
-        username= firstName+'_'+lastName
+        username= firstName+'.'+lastName
         accountType= "2"
         password= passwordEntry.get()
         confirmedPassword= confirmedPasswordEntry.get()
