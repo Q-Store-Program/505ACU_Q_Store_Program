@@ -5,7 +5,6 @@ import re
 import sqlite3
 from contextlib import closing
 import customtkinter as ctk
-import pyautogui
 from tkcalendar import DateEntry
 import os
 import csv
@@ -28,14 +27,11 @@ ctk.set_default_color_theme("dark-blue")
 # Setting program main window
 def disable_event():
     pass
-def on_key_press(event):
-    if event.keysym == 'Tab' and event.state == 0x20000:  # Check for Alt+Tab
-        pyautogui.hotkey('alt', 'tab')  # Prevent Alt+Tab by simulating Alt+Tab
+
 root = ctk.CTk()
 root.resizable(False, False)
 root.attributes("-fullscreen", True)
 root.protocol("WM_DELETE_WINDOW", disable_event)
-root.bind('<KeyPress>', on_key_press)
 root.title("505ACU Albany Q-Store Software Version: 0.9")
 screenWidth = root.winfo_screenwidth()
 screenHeight = root.winfo_screenheight()
@@ -3005,7 +3001,7 @@ def removeAACMemberOptions():
     listboxFrame.pack(pady = standardYPadding)
 
     #Creates list box and fills it with members names using SQL
-    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 30, height= 25, font= standardFont)
+    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 30, height= 30, font= standardFont)
     cursor = connection.cursor()
     data = cursor.execute("SELECT CadetID,rank,first_name,last_name FROM Cadets").fetchall()
     formatted_data = []
@@ -3172,7 +3168,7 @@ def changeIDOptions():
     listboxFrame.pack(pady = standardYPadding)
 
     #Creating list box and inserting contents of database into it using SQL
-    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 25, height= 15, font= standardFont)
+    namesListListbox = Listbox(listboxFrame, bg= "#292929", fg= "Silver", width= 25, height= 30, font= standardFont)
     cursor = connection.cursor()
     data = cursor.execute("SELECT CadetID,rank,first_name,last_name FROM Cadets").fetchall()
     formatted_data = []
@@ -3302,8 +3298,8 @@ def removeStoreOptions():
     canvas.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
 
     #Creates a scroll bar
-    buttonScrollbar= ctk.CTkScrollbar(middleFrame, orientation=VERTICAL, command=canvas.yview)
-    buttonScrollbar.pack(side="right", fill=Y)
+    buttonScrollbar= ctk.CTkScrollbar(middleFrame, orientation=VERTICAL, width=10, command=canvas.yview)
+    buttonScrollbar.pack(side="left", fill=Y)
     canvas.configure(yscrollcommand=buttonScrollbar.set)
     canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion= canvas.bbox("all")))
 
