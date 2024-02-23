@@ -29,14 +29,14 @@ def disable_event():
     pass
 
 root = ctk.CTk()
-root.resizable(False, False)
-root.attributes("-fullscreen", True)
-root.protocol("WM_DELETE_WINDOW", disable_event)
+#root.resizable(False, False)
+#root.attributes("-fullscreen", True)
+#root.protocol("WM_DELETE_WINDOW", disable_event)
 root.title("505ACU Albany Q-Store Software Version: 0.9")
-screenWidth = root.winfo_screenwidth()
-screenHeight = root.winfo_screenheight()
-root.geometry(f"{screenWidth}x{screenHeight}")
-root.state('zoomed')
+#screenWidth = root.winfo_screenwidth()
+#screenHeight = root.winfo_screenheight()
+#root.geometry(f"{screenWidth}x{screenHeight}")
+#root.state('zoomed')
 
 # Creating the main frame
 mainFrame = ctk.CTkFrame(root)
@@ -46,7 +46,7 @@ mainFrame.pack(fill="both", expand=True)
 mainFrame.rowconfigure(0, weight=1)
 mainFrame.columnconfigure(0, weight=1)
 mainFrame.columnconfigure(1, weight=1)
-mainFrame.columnconfigure(2, weight=5)
+mainFrame.columnconfigure(2, weight=3)
 
 # Creating the left frame
 leftFrame = ctk.CTkFrame(mainFrame, fg_color="#1f1f1f")
@@ -69,7 +69,7 @@ rightFrame.pack_propagate(False)
 leftFrame.columnconfigure(0, weight=3)
 leftFrame.columnconfigure(2, weight=0)
 leftFrame.rowconfigure(0, weight=1)
-leftFrame.rowconfigure(1, weight=5)
+leftFrame.rowconfigure(1, weight=2)
 
 # Creating the left top frame
 leftTopFrame = ctk.CTkFrame(leftFrame, fg_color="#292929")
