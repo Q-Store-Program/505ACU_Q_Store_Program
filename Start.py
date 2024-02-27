@@ -1,1 +1,3 @@
-import Q_Store_Software
+import os
+path= os.getcwd()
+os.system(f'python {path+"/Q_Store_Software.py"}')
